@@ -13,4 +13,6 @@ export class UserResponse implements User {
     constructor(user: User) {
         Object.assign(this, user);
     }
+    @Exclude()
+    provider: $Enums.Provider;
 }

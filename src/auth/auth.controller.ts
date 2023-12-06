@@ -6,17 +6,25 @@ import {
     Get,
     HttpStatus,
     Post,
+    Query,
+    Req,
     Res,
     UnauthorizedException,
+    UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
 import { LoginDto, RegisterDto } from './dto';
 import { AuthService } from './auth.service';
 import { Tokens } from './interfaces';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { Cookie, Public, UserAgent } from '@common/decorators';
 import { UserResponse } from '@user/responses';
+import { GoogleGuard } from './guards/google.guard';
+import { BASE_URL } from './config';
+import { HttpService } from '@nestjs/axios';
+import { map, mergeMap, tap } from 'rxjs';
+import { handleTimeoutAndErrors } from '@common/helpers';
 
 const REFRESH_TOKEN = 'refreshtoken';
 
@@ -26,6 +34,7 @@ export class AuthController {
     constructor(
         private readonly authService: AuthService,
         private readonly configService: ConfigService,
+        private readonly httpService: HttpService,
     ) {}
 
     @UseInterceptors(ClassSerializerInterceptor)
@@ -75,7 +84,28 @@ export class AuthController {
         this.setRefreshTokenToCookies(tokens, res);
     }
 
-    private setRefreshTokenToCookies(tokens: Tokens, res: Response) {
+    @UseGuards(GoogleGuard)
+    @Get('google')
+    googleAuth() {}
+
+    @UseGuards(GoogleGuard)
+    @Get('google/callback')
+    googleAuthCallback(@Req() req: Request, @Res() res: Response) {
+        const token = req.user['accessToken'];
+        //? add frontend url && add endpoint fron auth by google-token
+        return res.redirect(`${this.configService.get(BASE_URL)}/auth/success?token=${token}`);
+    }
+
+    @Get('success')
+    success(@Query('token') token: string, @UserAgent() agent: string, @Res() res: Response) {
+        return this.httpService.get(`https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${token}`).pipe(
+            mergeMap(({ data: { email } }) => this.authService.googleAuth(email, agent)),
+            map((data) => this.setRefreshTokenToCookies(data, res)),
+            handleTimeoutAndErrors(),
+        );
+    }
+
+    setRefreshTokenToCookies(tokens: Tokens, res: Response) {
         if (!tokens) {
             throw new UnauthorizedException();
         }
