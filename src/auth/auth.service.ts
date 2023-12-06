@@ -34,23 +34,26 @@ export class AuthService {
     }
 
     async register(dto: RegisterDto) {
-        if (this.getUser(dto)) {
+        const user: User = await this.userService.findOne(dto.email).catch((err) => {
+            this.logger.error(err);
+            return null;
+        });
+        if (user) {
             throw new ConflictException('Пользователь с таким email уже зарегистрирован');
         }
-
         return this.userService.create(dto).catch((err) => {
             this.logger.error(err);
             return null;
         });
     }
-
     async login(dto: LoginDto, agent: string): Promise<Tokens> {
-        const user = await this.getUser(dto);
-
+        const user: User = await this.userService.findOne(dto.email).catch((err) => {
+            this.logger.error(err);
+            return null;
+        });
         if (!user || !compareSync(dto.password, user.password)) {
-            throw new UnauthorizedException('Неверный логин или пароль');
+            throw new UnauthorizedException('Не верный логин или пароль');
         }
-
         return this.generateTokens(user, agent);
     }
 
@@ -94,12 +97,12 @@ export class AuthService {
         });
     }
 
-    private async getUser(dto: LoginDto | RegisterDto): Promise<User | null> {
-        const user: User = await this.userService.findOne(dto.email).catch((err) => {
-            this.logger.error(err);
-            return null;
-        });
+    // private async getUser(dto: LoginDto | RegisterDto): Promise<User | null> {
+    //     const user: User = await this.userService.findOne(dto.email).catch((err) => {
+    //         this.logger.error(err);
+    //         return null;
+    //     });
 
-        return user;
-    }
+    //     return user;
+    // }
 }
