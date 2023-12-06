@@ -49,7 +49,7 @@ export class AuthService {
         if (user) {
             throw new ConflictException('Пользователь с таким email уже зарегистрирован');
         }
-        return this.userService.create(dto).catch((err) => {
+        return this.userService.save(dto).catch((err) => {
             this.logger.error(err);
             return null;
         });
@@ -69,19 +69,23 @@ export class AuthService {
         return this.prismaService.token.delete({ where: { token } });
     }
 
-    async googleAuth(email: string, agent: string) {
+    async providerAuth(email: string, agent: string, provider: Provider) {
         const userExist = await this.userService.findOne(email);
         if (userExist) {
-            return this.generateTokens(userExist, agent);
+            const user = await this.userService.save({ email, provider }).catch((err) => {
+                this.logger.error(err);
+                return null;
+            });
+            return this.generateTokens(user, agent);
         }
-        const user = await this.userService.create({ email, provider: Provider.GOOGLE }).catch((err) => {
+        const user = await this.userService.save({ email, provider }).catch((err) => {
             this.logger.error(err);
             return null;
         });
         if (!user) {
             //? Поправить везде exeption
             throw new HttpException(
-                `Не получилось создать пользователя с email ${email} в Google Auth`,
+                `Не получилось создать пользователя с email ${email} в ${provider}`,
                 HttpStatus.BAD_REQUEST,
             );
         }
