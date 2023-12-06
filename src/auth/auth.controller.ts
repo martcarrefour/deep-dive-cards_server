@@ -50,17 +50,24 @@ export class AuthController {
         this.setRefreshTokenToCookies(tokens, res);
     }
 
+    @Post('logout')
+    async logout(@Cookie(REFRESH_TOKEN) refreshToken: string, @Res() res: Response) {
+        if (!refreshToken) {
+            res.sendStatus(HttpStatus.OK);
+            return;
+        }
+        await this.authService.deleteRefreshToken(refreshToken);
+        res.cookie(REFRESH_TOKEN, '', { httpOnly: true, secure: true, expires: new Date() });
+        res.sendStatus(HttpStatus.OK);
+    }
+
     @Get('refresh-tokens')
-    async refreshTokens(
-        @Cookie(REFRESH_TOKEN) refreshTokens: string,
-        @Res() res: Response,
-        @UserAgent() agent: string,
-    ) {
-        if (!refreshTokens) {
+    async refreshTokens(@Cookie(REFRESH_TOKEN) refreshToken: string, @Res() res: Response, @UserAgent() agent: string) {
+        if (!refreshToken) {
             throw new UnauthorizedException();
         }
 
-        const tokens = await this.authService.refreshTokens(refreshTokens, agent);
+        const tokens = await this.authService.refreshTokens(refreshToken, agent);
         if (!tokens) {
             throw new UnauthorizedException();
         }
@@ -79,6 +86,6 @@ export class AuthController {
             secure: true,
             path: '/',
         });
-        res.status(HttpStatus.CREATED).json({ accessToken: tokens.accessToken });
+        return res.status(HttpStatus.CREATED).json({ accessToken: tokens.accessToken });
     }
 }
