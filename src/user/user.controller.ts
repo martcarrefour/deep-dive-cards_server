@@ -22,9 +22,9 @@ export class UserController {
 
     @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
-    @Get('me/')
-    me(@CurrentUser() { id }: JwtPayload) {
-        return this.findOneUser(id);
+    @Get('me')
+    me(@CurrentUser() user: JwtPayload) {
+        return user;
     }
 
     @UseInterceptors(ClassSerializerInterceptor)
