@@ -14,5 +14,7 @@ export class UserResponse implements User {
         Object.assign(this, user);
     }
     @Exclude()
+    isBlocked: boolean;
+    @Exclude()
     provider: $Enums.Provider;
 }
