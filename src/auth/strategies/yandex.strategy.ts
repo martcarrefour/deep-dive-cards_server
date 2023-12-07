@@ -1,4 +1,4 @@
-import { BASE_URL, YANDEX_APP_ID, YANDEX_APP_SECRET } from '@auth/config';
+import { BASE_URL, YANDEX_OAUTH_CONFIG } from '@auth/config';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
@@ -8,8 +8,8 @@ import { Strategy } from 'passport-yandex';
 export class YandexStrategy extends PassportStrategy(Strategy, 'yandex') {
     constructor(private readonly configService: ConfigService) {
         super({
-            clientID: configService.get(YANDEX_APP_ID), // Замените на свой APP_ID
-            clientSecret: configService.get(YANDEX_APP_SECRET), // Замените на свой APP_SECRET
+            clientID: configService.get(YANDEX_OAUTH_CONFIG.APP_ID), // Замените на свой APP_ID
+            clientSecret: configService.get(YANDEX_OAUTH_CONFIG.APP_SECRET), // Замените на свой APP_SECRET
             callbackURL: `${configService.get(BASE_URL)}/auth/yandex/callback`, // Замените на свой callback URL
         });
     }

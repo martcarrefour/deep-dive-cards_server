@@ -1,4 +1,4 @@
-import { BASE_URL, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from '@auth/config';
+import { BASE_URL, GOOGLE_OAUTH_CONFIG } from '@auth/config';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
@@ -8,8 +8,8 @@ import { Strategy } from 'passport-google-oauth20';
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     constructor(private readonly configService: ConfigService) {
         super({
-            clientID: configService.get(GOOGLE_CLIENT_ID), // получите это из Google Cloud Console
-            clientSecret: configService.get(GOOGLE_CLIENT_SECRET), // получите это из Google Cloud Console
+            clientID: configService.get(GOOGLE_OAUTH_CONFIG.CLIENT_ID), // получите это из Google Cloud Console
+            clientSecret: configService.get(GOOGLE_OAUTH_CONFIG.CLIENT_SECRET), // получите это из Google Cloud Console
             callbackURL: `${configService.get(BASE_URL)}/auth/google/callback`, // измените это на свой callback URL
             scope: ['email', 'profile'],
         });

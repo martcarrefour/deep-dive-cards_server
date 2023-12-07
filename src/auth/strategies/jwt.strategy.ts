@@ -2,7 +2,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JWT_SECRET } from '@auth/config';
+import { JWT_CONFIG } from '@auth/config';
 import { JwtPayload } from '@auth/interfaces';
 import { UserService } from '@user/user.service';
 import { User } from '@prisma/client';
@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: configService.get<string>(JWT_SECRET),
+            secretOrKey: configService.get<string>(JWT_CONFIG.SECRET),
         });
     }
 
@@ -27,7 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             this.logger.error(err);
             return null;
         });
-        console.log(user);
+
         if (!user || user.isBlocked) {
             throw new UnauthorizedException();
         }

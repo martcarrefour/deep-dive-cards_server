@@ -1,4 +1,4 @@
-import { JWT_EXP } from '@auth/config';
+import { JWT_CONFIG } from '@auth/config';
 import { JwtPayload } from '@auth/interfaces';
 import { convertToSecondsUtil } from '@common/utils';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -58,7 +58,7 @@ export class UserService {
                 return null;
             }
 
-            await this.cacheManager.set(idOrEmail, user, convertToSecondsUtil(this.configService.get(JWT_EXP)));
+            await this.cacheManager.set(idOrEmail, user, convertToSecondsUtil(this.configService.get(JWT_CONFIG.EXP)));
             return user;
         }
         return user;
