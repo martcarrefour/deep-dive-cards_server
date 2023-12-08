@@ -19,7 +19,7 @@ model User {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   roles     Role[]
-  Token     Token[]
+  token     Token[]
   isBlocked Boolean   @default(false) @map("is_blocked")
   Pack      Pack[]
 
@@ -30,7 +30,7 @@ model Token {
   token     String   @unique
   exp       DateTime
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
+  userId    String   @map("user_id")
   userAgent String   @map("user_agent")
 
   @@map("tokens")
@@ -39,7 +39,7 @@ model Token {
 model Pack {
   id        Int      @id @default(autoincrement())
   author    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
+  userId    String   @map("user_id")
   title     String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -55,7 +55,7 @@ model Tag {
   id        Int      @id @default(autoincrement())
   title     String
   pack      Pack     @relation(fields: [packId], references: [id])
-  packId    Int
+  packId    Int      @map("pack_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -65,7 +65,7 @@ model Tag {
 model Card {
   id        Int      @id @default(autoincrement())
   pack      Pack     @relation(fields: [packId], references: [id])
-  packId    Int
+  packId    Int      @map("pack_id")
   question  String
   answer    String
   hint      String?
