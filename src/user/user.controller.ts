@@ -22,11 +22,13 @@ import { Role, User } from '@prisma/client';
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
+    @UseInterceptors(ClassSerializerInterceptor)
     @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN)
+    @Roles(Role.USER)
     @Get('me')
-    me(@CurrentUser() user: JwtPayload) {
-        return user;
+    async me(@CurrentUser() user: JwtPayload) {
+        const newUser = await this.userService.findOne(user.email);
+        return new UserResponse(newUser);
     }
 
     @UseInterceptors(ClassSerializerInterceptor)

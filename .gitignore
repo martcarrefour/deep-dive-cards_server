@@ -44,3 +44,4 @@ lerna-debug.log*
 # Database
 dev.db
 dev.db-journal
+db.drawio

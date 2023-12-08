@@ -13,6 +13,7 @@ export class UserResponse implements User {
     constructor(user: User) {
         Object.assign(this, user);
     }
+    username: string;
     @Exclude()
     isBlocked: boolean;
 

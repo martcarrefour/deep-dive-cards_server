@@ -25,6 +25,7 @@ export class UserService {
                 email: user.email,
             },
             update: {
+                username: user.username ?? undefined,
                 password: hashedPassword ?? undefined,
                 provider: user?.provider ?? undefined,
                 roles: user?.roles ?? undefined,
@@ -35,6 +36,7 @@ export class UserService {
                 password: hashedPassword,
                 provider: user?.provider,
                 roles: ['USER'],
+                username: user.username,
             },
         });
         await this.cacheManager.set(savedUser.id, savedUser);
@@ -46,7 +48,9 @@ export class UserService {
         if (isReset) {
             await this.cacheManager.del(idOrEmail);
         }
+
         const user = await this.cacheManager.get<User>(idOrEmail);
+
         if (!user) {
             const user = await this.prismaService.user.findFirst({
                 where: {

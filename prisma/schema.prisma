@@ -13,6 +13,7 @@ datasource db {
 model User {
   id        String    @id @default(uuid())
   email     String    @unique
+  username  String?   @unique
   password  String?
   provider  Provider?
   createdAt DateTime  @default(now()) @map("created_at")
@@ -20,6 +21,7 @@ model User {
   roles     Role[]
   Token     Token[]
   isBlocked Boolean   @default(false) @map("is_blocked")
+  Pack      Pack[]
 
   @@map("users")
 }
@@ -32,6 +34,46 @@ model Token {
   userAgent String   @map("user_agent")
 
   @@map("tokens")
+}
+
+model Pack {
+  id        Int      @id @default(autoincrement())
+  author    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  title     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  isPublic  Boolean  @map("is_public")
+  rating    Decimal  @default(0)
+  card      Card[]
+  tag       Tag[]
+
+  @@map("packs")
+}
+
+model Tag {
+  id        Int      @id @default(autoincrement())
+  title     String
+  pack      Pack     @relation(fields: [packId], references: [id])
+  packId    Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("tags")
+}
+
+model Card {
+  id        Int      @id @default(autoincrement())
+  pack      Pack     @relation(fields: [packId], references: [id])
+  packId    Int
+  question  String
+  answer    String
+  hint      String?
+  level     Int?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("cards")
 }
 
 enum Role {
