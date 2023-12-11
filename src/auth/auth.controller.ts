@@ -41,21 +41,23 @@ export class AuthController {
 
     @UseInterceptors(ClassSerializerInterceptor)
     @Post('register')
-    async register(@Body() dto: RegisterDto) {
-        const user = await this.authService.register(dto);
+    async register(@Body() registerDto: RegisterDto) {
+        const user = await this.authService.register(registerDto);
         if (!user) {
-            throw new BadRequestException(`Не удалось зарегистрировать пользователя с данными: ${JSON.stringify(dto)}`);
+            throw new BadRequestException(
+                `Не удалось зарегистрировать пользователя с данными: ${JSON.stringify(registerDto)}`,
+            );
         }
 
         return new UserResponse(user);
     }
 
     @Post('login')
-    async login(@Body() dto: LoginDto, @Res() res: Response, @UserAgent() agent: string) {
-        const tokens = await this.authService.login(dto, agent);
+    async login(@Body() loginDto: LoginDto, @Res() res: Response, @UserAgent() agent: string) {
+        const tokens = await this.authService.login(loginDto, agent);
 
         if (!tokens) {
-            throw new BadRequestException(`Не получается войти с данными: ${JSON.stringify(dto)}`);
+            throw new BadRequestException(`Не получается войти с данными: ${JSON.stringify(loginDto)}`);
         }
 
         this.setRefreshTokenToCookies(tokens, res);

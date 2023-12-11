@@ -25,6 +25,34 @@ export class AuthService {
         private readonly prismaService: PrismaService,
     ) {}
 
+    async register(registerDto: RegisterDto) {
+        const user: User = await this.userService.findOne(registerDto.email).catch((err) => {
+            this.logger.error(err);
+            return null;
+        });
+        if (user) {
+            throw new ConflictException('Пользователь с таким email уже зарегистрирован');
+        }
+        return this.userService.create(registerDto).catch((err) => {
+            this.logger.error(err);
+            return null;
+        });
+    }
+    async login(login: LoginDto, agent: string): Promise<Tokens> {
+        const user: User = await this.userService.findOne(login.email, true).catch((err) => {
+            this.logger.error(err);
+            return null;
+        });
+        if (!user || !compareSync(login.password, user.password)) {
+            throw new UnauthorizedException('Не верный логин или пароль');
+        }
+        return this.generateTokens(user, agent);
+    }
+
+    async deleteRefreshToken(token: string) {
+        return this.prismaService.token.delete({ where: { token } });
+    }
+
     async refreshTokens(refreshTokens: string, agent: string): Promise<Tokens> {
         const token = await this.prismaService.token.delete({ where: { token: refreshTokens } });
         if (!token || new Date(token.exp) < new Date()) {
@@ -35,44 +63,16 @@ export class AuthService {
         return this.generateTokens(user, agent);
     }
 
-    async register(dto: RegisterDto) {
-        const user: User = await this.userService.findOne(dto.email).catch((err) => {
-            this.logger.error(err);
-            return null;
-        });
-        if (user) {
-            throw new ConflictException('Пользователь с таким email уже зарегистрирован');
-        }
-        return this.userService.save(dto).catch((err) => {
-            this.logger.error(err);
-            return null;
-        });
-    }
-    async login(dto: LoginDto, agent: string): Promise<Tokens> {
-        const user: User = await this.userService.findOne(dto.email, true).catch((err) => {
-            this.logger.error(err);
-            return null;
-        });
-        if (!user || !compareSync(dto.password, user.password)) {
-            throw new UnauthorizedException('Не верный логин или пароль');
-        }
-        return this.generateTokens(user, agent);
-    }
-
-    async deleteRefreshToken(token: string) {
-        return this.prismaService.token.delete({ where: { token } });
-    }
-
     async providerAuth(email: string, agent: string, provider: Provider) {
         const userExist = await this.userService.findOne(email);
         if (userExist) {
-            const user = await this.userService.save({ email, provider }).catch((err) => {
+            const user = await this.userService.create({ email, provider }).catch((err) => {
                 this.logger.error(err);
                 return null;
             });
             return this.generateTokens(user, agent);
         }
-        const user = await this.userService.save({ email, provider }).catch((err) => {
+        const user = await this.userService.create({ email, provider }).catch((err) => {
             this.logger.error(err);
             return null;
         });
@@ -125,13 +125,4 @@ export class AuthService {
             },
         });
     }
-
-    // private async getUser(dto: LoginDto | RegisterDto): Promise<User | null> {
-    //     const user: User = await this.userService.findOne(dto.email).catch((err) => {
-    //         this.logger.error(err);
-    //         return null;
-    //     });
-
-    //     return user;
-    // }
 }

@@ -12,10 +12,9 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserResponse } from './responses';
-import { CurrentUser } from '@common/decorators/current.user.decorator';
 import { JwtPayload } from '@auth/interfaces';
 import { RolesGuard } from '@auth/guards/role.guard';
-import { Roles } from '@common/decorators';
+import { CurrentUser, Roles } from '@common/decorators';
 import { Role, User } from '@prisma/client';
 
 @Controller('user')
@@ -27,14 +26,14 @@ export class UserController {
     @Roles(Role.USER)
     @Get('me')
     async me(@CurrentUser() user: JwtPayload) {
-        const newUser = await this.userService.findOne(user.email);
-        return new UserResponse(newUser);
+        const me = await this.userService.findOne(user.email);
+        return new UserResponse(me);
     }
 
     @UseInterceptors(ClassSerializerInterceptor)
     @Put()
     async updateUser(@Body() body: Partial<User>) {
-        const user = await this.userService.save(body);
+        const user = await this.userService.create(body);
         return new UserResponse(user);
     }
 

@@ -11,16 +11,16 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  username  String?   @unique
+  id        String        @id @default(uuid())
+  email     String        @unique
+  username  String?       @unique
   password  String?
-  provider  Provider?
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  roles     Role[]
+  provider  AuthProvider?
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+  roles     UserRole[]
   token     Token[]
-  isBlocked Boolean   @default(false) @map("is_blocked")
+  isBlocked Boolean       @default(false) @map("is_blocked")
   Pack      Pack[]
 
   @@map("users")
@@ -43,10 +43,10 @@ model Pack {
   title     String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  isPublic  Boolean  @map("is_public")
+  isPublic  Boolean  @default(false) @map("is_public")
   rating    Decimal  @default(0)
   card      Card[]
-  tag       Tag[]
+  tags      Tag[]
 
   @@map("packs")
 }
@@ -54,10 +54,9 @@ model Pack {
 model Tag {
   id        Int      @id @default(autoincrement())
   title     String
-  pack      Pack     @relation(fields: [packId], references: [id])
-  packId    Int      @map("pack_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  packs     Pack[]
 
   @@map("tags")
 }
@@ -76,12 +75,12 @@ model Card {
   @@map("cards")
 }
 
-enum Role {
+enum UserRole {
   ADMIN
   USER
 }
 
-enum Provider {
+enum AuthProvider {
   GOOGLE
   YANDEX
 }

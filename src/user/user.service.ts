@@ -17,7 +17,7 @@ export class UserService {
         private readonly configService: ConfigService,
     ) {}
 
-    async save(user: Partial<User>) {
+    async create(user: Partial<User>) {
         const hashedPassword = user?.password ? this.hashPassword(user.password) : null;
 
         const savedUser = await this.prismaService.user.upsert({

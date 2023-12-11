@@ -1,34 +1,48 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    UsePipes,
+    ValidationPipe,
+    UnauthorizedException,
+} from '@nestjs/common';
 import { PackService } from './pack.service';
 import { CreatePackDto } from './dto/create-pack.dto';
 import { UpdatePackDto } from './dto/update-pack.dto';
+import { CurrentUser } from '@common/decorators';
+import { JwtPayload } from '@auth/interfaces';
 
 @Controller('pack')
 export class PackController {
-  constructor(private readonly packService: PackService) {}
+    constructor(private readonly packService: PackService) {}
 
-  @Post()
-  create(@Body() createPackDto: CreatePackDto) {
-    return this.packService.create(createPackDto);
-  }
+    @Post()
+    @UsePipes(new ValidationPipe())
+    async create(@Body() createPackDto: CreatePackDto, @CurrentUser() user: JwtPayload) {
+        return this.packService.create(createPackDto, user);
+    }
 
-  @Get()
-  findAll() {
-    return this.packService.findAll();
-  }
+    @Get()
+    async findAll(@CurrentUser() user: JwtPayload) {
+        return this.packService.findAll(user);
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.packService.findOne(+id);
-  }
+    @Get(':id')
+    async findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+        return this.packService.findOne(+id, user);
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePackDto: UpdatePackDto) {
-    return this.packService.update(+id, updatePackDto);
-  }
+    @Patch(':id')
+    update(@Param('id') id: string, @Body() updatePackDto: UpdatePackDto) {
+        return this.packService.update(+id, updatePackDto);
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.packService.remove(+id);
-  }
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.packService.remove(+id);
+    }
 }
