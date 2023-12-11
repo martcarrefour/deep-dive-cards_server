@@ -4,6 +4,7 @@ import {
     Controller,
     Delete,
     Get,
+    NotFoundException,
     Param,
     ParseUUIDPipe,
     Put,
@@ -41,6 +42,9 @@ export class UserController {
     @Get(':idOrEmail')
     async findOneUser(@Param('idOrEmail') idOrEmail: string) {
         const user = await this.userService.findOne(idOrEmail);
+        if (!user) {
+            return new NotFoundException();
+        }
         return new UserResponse(user);
     }
 

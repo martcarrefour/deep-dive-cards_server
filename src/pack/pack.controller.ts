@@ -9,6 +9,7 @@ import {
     UsePipes,
     ValidationPipe,
     UnauthorizedException,
+    NotFoundException,
 } from '@nestjs/common';
 import { PackService } from './pack.service';
 import { CreatePackDto } from './dto/create-pack.dto';
@@ -33,7 +34,8 @@ export class PackController {
 
     @Get(':id')
     async findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-        return this.packService.findOne(+id, user);
+        const pack = await this.packService.findOne(+id, user);
+        return pack;
     }
 
     @Patch(':id')

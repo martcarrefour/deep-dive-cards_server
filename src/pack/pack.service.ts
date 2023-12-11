@@ -1,9 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ClassSerializerInterceptor, Injectable, Logger, UseInterceptors } from '@nestjs/common';
 import { UpdatePackDto } from './dto/update-pack.dto';
 import { CreatePackDto } from './dto';
 
 import { PrismaService } from '@prisma/prisma.service';
 import { JwtPayload } from '@auth/interfaces';
+import { Pack } from '@prisma/client';
 
 @Injectable()
 export class PackService {
@@ -31,7 +32,8 @@ export class PackService {
         return packs;
     }
 
-    async findOne(id: number, user: JwtPayload) {
+    @UseInterceptors(ClassSerializerInterceptor)
+    async findOne(id: number, user: JwtPayload): Promise<Pack> {
         const pack = await this.prismaService.pack.findFirst({
             where: { id: id, userId: user.id },
         });
