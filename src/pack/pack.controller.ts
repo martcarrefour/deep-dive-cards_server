@@ -34,7 +34,7 @@ export class PackController {
 
     @Get(':id')
     async findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-        const pack = await this.packService.findOne(+id, user);
+        const pack = await this.packService.findOneById(+id, user);
         return pack;
     }
 

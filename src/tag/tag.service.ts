@@ -1,26 +1,40 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
+import { PrismaService } from '@prisma/prisma.service';
+import { Tag } from '@prisma/client';
 
 @Injectable()
 export class TagService {
-  create(createTagDto: CreateTagDto) {
-    return 'This action adds a new tag';
-  }
+    private readonly logger = new Logger(TagService.name);
+    constructor(private readonly prismaService: PrismaService) {}
 
-  findAll() {
-    return `This action returns all tag`;
-  }
+    async create(createTagDto: CreateTagDto) {
+        const newTag = await this.prismaService.tag.create({
+            data: {
+                title: createTagDto.title,
+            },
+        });
+        return newTag;
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} tag`;
-  }
+    async findAll() {
+        const tags = await this.prismaService.tag.findMany();
+        return tags;
+    }
 
-  update(id: number, updateTagDto: UpdateTagDto) {
-    return `This action updates a #${id} tag`;
-  }
+    async findOneById(id: number): Promise<Tag> {
+        const tag = await this.prismaService.tag.findUnique({
+            where: { id: id },
+        });
+        return tag;
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} tag`;
-  }
+    update(id: number, updateTagDto: UpdateTagDto) {
+        return `This action updates a #${id} tag`;
+    }
+
+    remove(id: number) {
+        return `This action removes a #${id} tag`;
+    }
 }

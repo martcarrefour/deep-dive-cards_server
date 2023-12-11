@@ -5,30 +5,30 @@ import { UpdateTagDto } from './dto/update-tag.dto';
 
 @Controller('tag')
 export class TagController {
-  constructor(private readonly tagService: TagService) {}
+    constructor(private readonly tagService: TagService) {}
 
-  @Post()
-  create(@Body() createTagDto: CreateTagDto) {
-    return this.tagService.create(createTagDto);
-  }
+    @Post()
+    create(@Body() createTagDto: CreateTagDto) {
+        return this.tagService.create(createTagDto);
+    }
 
-  @Get()
-  findAll() {
-    return this.tagService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.tagService.findAll();
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tagService.findOne(+id);
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.tagService.findOneById(+id);
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTagDto: UpdateTagDto) {
-    return this.tagService.update(+id, updateTagDto);
-  }
+    @Patch(':id')
+    update(@Param('id') id: string, @Body() updateTagDto: UpdateTagDto) {
+        return this.tagService.update(+id, updateTagDto);
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tagService.remove(+id);
-  }
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.tagService.remove(+id);
+    }
 }

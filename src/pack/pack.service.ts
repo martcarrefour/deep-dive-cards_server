@@ -33,7 +33,7 @@ export class PackService {
     }
 
     @UseInterceptors(ClassSerializerInterceptor)
-    async findOne(id: number, user: JwtPayload): Promise<Pack> {
+    async findOneById(id: number, user: JwtPayload): Promise<Pack> {
         const pack = await this.prismaService.pack.findFirst({
             where: { id: id, userId: user.id },
         });

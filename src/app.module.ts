@@ -10,10 +10,17 @@ import { APP_GUARD } from '@nestjs/core';
 import { PackModule } from './pack/pack.module';
 import { CardModule } from './card/card.module';
 import { TagModule } from './tag/tag.module';
-import { TagModule } from './tag/tag.module';
 
 @Module({
-    imports: [UserModule, PrismaModule, AuthModule, ConfigModule.forRoot({ isGlobal: true }), PackModule, CardModule, TagModule],
+    imports: [
+        UserModule,
+        PrismaModule,
+        AuthModule,
+        ConfigModule.forRoot({ isGlobal: true }),
+        PackModule,
+        CardModule,
+        TagModule,
+    ],
     controllers: [AppController],
     providers: [
         AppService,

@@ -3,7 +3,7 @@ import { TagService } from './tag.service';
 import { TagController } from './tag.controller';
 
 @Module({
-  controllers: [TagController],
-  providers: [TagService],
+    controllers: [TagController],
+    providers: [TagService],
 })
 export class TagModule {}
