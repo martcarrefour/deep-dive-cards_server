@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    UsePipes,
+    ValidationPipe,
+    ParseIntPipe,
+} from '@nestjs/common';
 import { PackService } from './pack.service';
 import { CreatePackDto } from './dto/create-pack.dto';
 import { UpdatePackDto } from './dto/update-pack.dto';
@@ -21,18 +32,22 @@ export class PackController {
     }
 
     @Get(':id')
-    async findById(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-        const pack = await this.packService.findById(+id, user);
+    async findById(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: JwtPayload) {
+        const pack = await this.packService.findById(id, user);
         return pack;
     }
 
     @Patch(':id')
-    update(@Param('id') id: string, @Body() updatePackDto: UpdatePackDto, @CurrentUser() user: JwtPayload) {
-        return this.packService.update(+id, updatePackDto, user);
+    update(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() updatePackDto: UpdatePackDto,
+        @CurrentUser() user: JwtPayload,
+    ) {
+        return this.packService.update(id, updatePackDto, user);
     }
 
     @Delete(':id')
-    delete(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-        return this.packService.delete(+id, user);
+    delete(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: JwtPayload) {
+        return this.packService.delete(id, user);
     }
 }

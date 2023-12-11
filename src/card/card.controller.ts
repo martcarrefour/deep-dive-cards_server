@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
@@ -8,27 +8,31 @@ export class CardController {
     constructor(private readonly cardService: CardService) {}
 
     @Post()
-    create(@Body() createCardDto: CreateCardDto, @Param('packId') packId: string) {
-        return this.cardService.create(createCardDto, +packId);
+    create(@Body() createCardDto: CreateCardDto, @Param('packId', ParseIntPipe) packId: number) {
+        return this.cardService.create(createCardDto, packId);
     }
 
     @Get()
-    findAll(@Param('packId') packId: string) {
-        return this.cardService.findAll(+packId);
+    findAll(@Param('packId', ParseIntPipe) packId: number) {
+        return this.cardService.findAll(packId);
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string, @Param('packId') packId: string) {
-        return this.cardService.findById(+id, +packId);
+    findOne(@Param('id', ParseIntPipe) id: number, @Param('packId', ParseIntPipe) packId: number) {
+        return this.cardService.findById(id, packId);
     }
 
     @Patch(':id')
-    update(@Param('id') id: string, @Body() updateCardDto: UpdateCardDto, @Param('packId') packId: string) {
-        return this.cardService.update(+id, +packId, updateCardDto);
+    update(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() updateCardDto: UpdateCardDto,
+        @Param('packId', ParseIntPipe) packId: number,
+    ) {
+        return this.cardService.update(id, packId, updateCardDto);
     }
 
     @Delete(':id')
-    delete(@Param('id') id: string, @Param('packId') packId: string) {
-        return this.cardService.delete(+id, +packId);
+    delete(@Param('id', ParseIntPipe) id: number, @Param('packId', ParseIntPipe) packId: number) {
+        return this.cardService.delete(id, packId);
     }
 }

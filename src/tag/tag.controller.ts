@@ -28,7 +28,7 @@ export class TagController {
     }
 
     @Delete(':title')
-    delete(@Param('title') title) {
+    delete(@Param('title') title: string) {
         return this.tagService.delete(title);
     }
 }
