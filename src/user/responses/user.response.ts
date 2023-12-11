@@ -8,7 +8,7 @@ export class UserResponse implements User {
     password: string;
     createdAt: Date;
     updatedAt: Date;
-    roles: $Enums.Role[];
+    roles: $Enums.UserRole[];
 
     constructor(user: User) {
         Object.assign(this, user);
@@ -18,5 +18,5 @@ export class UserResponse implements User {
     isBlocked: boolean;
 
     @Exclude()
-    provider: $Enums.Provider;
+    provider: $Enums.AuthProvider;
 }

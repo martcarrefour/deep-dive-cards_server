@@ -1,18 +1,25 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { PrismaService } from '@prisma/prisma.service';
 import { Tag } from '@prisma/client';
+import { title } from 'process';
 
 @Injectable()
 export class TagService {
     private readonly logger = new Logger(TagService.name);
     constructor(private readonly prismaService: PrismaService) {}
 
-    async create(createTagDto: CreateTagDto) {
+    async create({ title }: CreateTagDto) {
+        const tag = await this.findByTitle(title);
+
+        if (tag) {
+            return new ConflictException();
+        }
+
         const newTag = await this.prismaService.tag.create({
             data: {
-                title: createTagDto.title,
+                title: title,
             },
         });
         return newTag;
@@ -23,18 +30,38 @@ export class TagService {
         return tags;
     }
 
-    async findOneById(id: number): Promise<Tag> {
-        const tag = await this.prismaService.tag.findUnique({
-            where: { id: id },
+    async findByTitle(title: string): Promise<Tag> {
+        const tag = await this.prismaService.tag.findFirst({
+            where: { title: title },
         });
         return tag;
     }
 
-    update(id: number, updateTagDto: UpdateTagDto) {
-        return `This action updates a #${id} tag`;
+    async update(title: string, updateTagDto: UpdateTagDto) {
+        const tag = await this.findByTitle(title);
+
+        if (!tag) {
+            return new NotFoundException();
+        }
+
+        const updatedTag = await this.prismaService.tag.update({
+            where: { title },
+            data: { title: updateTagDto.title },
+        });
+        return updatedTag;
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} tag`;
+    async delete(title: string) {
+        const tag = await this.findByTitle(title);
+
+        if (!tag) {
+            return new NotFoundException();
+        }
+
+        return await this.prismaService.tag.delete({
+            where: {
+                title,
+            },
+        });
     }
 }

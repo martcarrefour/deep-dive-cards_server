@@ -4,7 +4,7 @@ import { convertToSecondsUtil } from '@common/utils';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Role, User } from '@prisma/client';
+import { UserRole, User } from '@prisma/client';
 import { PrismaService } from '@prisma/prisma.service';
 import { genSaltSync, hashSync } from 'bcrypt';
 import { Cache } from 'cache-manager';
@@ -20,16 +20,16 @@ export class UserService {
     async create(user: Partial<User>) {
         const hashedPassword = user?.password ? this.hashPassword(user.password) : null;
 
-        const savedUser = await this.prismaService.user.upsert({
+        const createdUser = await this.prismaService.user.upsert({
             where: {
                 email: user.email,
             },
             update: {
-                username: user.username ?? undefined,
                 password: hashedPassword ?? undefined,
                 provider: user?.provider ?? undefined,
                 roles: user?.roles ?? undefined,
                 isBlocked: user.isBlocked ?? undefined,
+                username: user.username ?? undefined,
             },
             create: {
                 email: user.email,
@@ -39,12 +39,12 @@ export class UserService {
                 username: user.username,
             },
         });
-        await this.cacheManager.set(savedUser.id, savedUser);
-        await this.cacheManager.set(savedUser.email, savedUser);
-        return savedUser;
+        await this.cacheManager.set(createdUser.id, createdUser);
+        await this.cacheManager.set(createdUser.email, createdUser);
+        return createdUser;
     }
 
-    async findOne(idOrEmail: string, isReset = false): Promise<User> {
+    async findByEmailOrId(idOrEmail: string, isReset = false): Promise<User> {
         if (isReset) {
             await this.cacheManager.del(idOrEmail);
         }
@@ -69,7 +69,7 @@ export class UserService {
     }
 
     async delete(id: string, user: JwtPayload) {
-        if (user.id !== id && !user.roles.includes(Role.ADMIN)) {
+        if (user.id !== id && !user.roles.includes(UserRole.ADMIN)) {
             throw new ForbiddenException();
         }
         await Promise.all([this.cacheManager.del(id), this.cacheManager.del(user.email)]);

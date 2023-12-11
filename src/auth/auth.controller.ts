@@ -26,7 +26,7 @@ import { HttpService } from '@nestjs/axios';
 import { map, mergeMap, tap } from 'rxjs';
 import { handleTimeoutAndErrors } from '@common/helpers';
 import { YandexGuard } from './guards/yandex.guard';
-import { Provider } from '@prisma/client';
+import { AuthProvider } from '@prisma/client';
 
 const REFRESH_TOKEN = 'refreshtoken';
 
@@ -114,7 +114,7 @@ export class AuthController {
     @Get('success-google')
     successGoogle(@Query('token') token: string, @UserAgent() agent: string, @Res() res: Response) {
         return this.httpService.get(`https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${token}`).pipe(
-            mergeMap(({ data: { email } }) => this.authService.providerAuth(email, agent, Provider.GOOGLE)),
+            mergeMap(({ data: { email } }) => this.authService.providerAuth(email, agent, AuthProvider.GOOGLE)),
             map((data) => this.setRefreshTokenToCookies(data, res)),
             handleTimeoutAndErrors(),
         );
@@ -124,7 +124,7 @@ export class AuthController {
     successYandex(@Query('token') token: string, @UserAgent() agent: string, @Res() res: Response) {
         return this.httpService.get(`https://login.yandex.ru/info?format=json&oauth_token=${token}`).pipe(
             mergeMap(({ data: { default_email } }) =>
-                this.authService.providerAuth(default_email, agent, Provider.YANDEX),
+                this.authService.providerAuth(default_email, agent, AuthProvider.YANDEX),
             ),
             map((data) => this.setRefreshTokenToCookies(data, res)),
             handleTimeoutAndErrors(),

@@ -33,18 +33,18 @@ export class PackController {
     }
 
     @Get(':id')
-    async findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-        const pack = await this.packService.findOneById(+id, user);
+    async findById(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+        const pack = await this.packService.findById(+id, user);
         return pack;
     }
 
     @Patch(':id')
-    update(@Param('id') id: string, @Body() updatePackDto: UpdatePackDto) {
-        return this.packService.update(+id, updatePackDto);
+    update(@Param('id') id: string, @Body() updatePackDto: UpdatePackDto, @CurrentUser() user: JwtPayload) {
+        return this.packService.update(+id, updatePackDto, user);
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.packService.remove(+id);
+    delete(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+        return this.packService.delete(+id, user);
     }
 }

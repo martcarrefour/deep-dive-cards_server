@@ -10,7 +10,7 @@ import { LoginDto, RegisterDto } from './dto';
 import { UserService } from '@user/user.service';
 import { Tokens } from './interfaces';
 import { compareSync } from 'bcrypt';
-import { Provider, Token, User } from '@prisma/client';
+import { AuthProvider, Token, User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '@prisma/prisma.service';
 import { v4 } from 'uuid';
@@ -26,7 +26,7 @@ export class AuthService {
     ) {}
 
     async register(registerDto: RegisterDto) {
-        const user: User = await this.userService.findOne(registerDto.email).catch((err) => {
+        const user: User = await this.userService.findByEmailOrId(registerDto.email).catch((err) => {
             this.logger.error(err);
             return null;
         });
@@ -39,7 +39,7 @@ export class AuthService {
         });
     }
     async login(login: LoginDto, agent: string): Promise<Tokens> {
-        const user: User = await this.userService.findOne(login.email, true).catch((err) => {
+        const user: User = await this.userService.findByEmailOrId(login.email, true).catch((err) => {
             this.logger.error(err);
             return null;
         });
@@ -59,12 +59,12 @@ export class AuthService {
             throw new UnauthorizedException();
         }
 
-        const user = await this.userService.findOne(token.userId);
+        const user = await this.userService.findByEmailOrId(token.userId);
         return this.generateTokens(user, agent);
     }
 
-    async providerAuth(email: string, agent: string, provider: Provider) {
-        const userExist = await this.userService.findOne(email);
+    async providerAuth(email: string, agent: string, provider: AuthProvider) {
+        const userExist = await this.userService.findByEmailOrId(email);
         if (userExist) {
             const user = await this.userService.create({ email, provider }).catch((err) => {
                 this.logger.error(err);

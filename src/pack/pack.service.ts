@@ -1,10 +1,11 @@
-import { ClassSerializerInterceptor, Injectable, Logger, UseInterceptors } from '@nestjs/common';
+import { ClassSerializerInterceptor, Injectable, Logger, NotFoundException, UseInterceptors } from '@nestjs/common';
 import { UpdatePackDto } from './dto/update-pack.dto';
 import { CreatePackDto } from './dto';
 
 import { PrismaService } from '@prisma/prisma.service';
 import { JwtPayload } from '@auth/interfaces';
 import { Pack } from '@prisma/client';
+import { isPublic } from '@common/decorators';
 
 @Injectable()
 export class PackService {
@@ -33,18 +34,51 @@ export class PackService {
     }
 
     @UseInterceptors(ClassSerializerInterceptor)
-    async findOneById(id: number, user: JwtPayload): Promise<Pack> {
+    async findById(id: number, user: JwtPayload): Promise<Pack> {
         const pack = await this.prismaService.pack.findFirst({
             where: { id: id, userId: user.id },
         });
         return pack;
     }
 
-    update(id: number, updatePackDto: UpdatePackDto) {
-        return `This action updates a #${id} pack`;
+    async update(id: number, { title, isPublic, tags }: UpdatePackDto, user: JwtPayload) {
+        console.log(tags);
+        const updatedPack = await this.prismaService.pack.upsert({
+            where: { id: id, userId: user.id },
+            update: {
+                title: title,
+                isPublic: isPublic,
+                tags: {
+                    set: tags,
+                },
+            },
+            create: {
+                title: title,
+                userId: user.id,
+                tags: {
+                    create: tags,
+                },
+            },
+            include: {
+                tags: true,
+            },
+        });
+
+        return updatedPack;
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} pack`;
+    async delete(id: number, user: JwtPayload) {
+        const pack = await this.findById(id, user);
+
+        if (!pack) {
+            return new NotFoundException();
+        }
+
+        return await this.prismaService.pack.delete({
+            where: {
+                id,
+                userId: user.id,
+            },
+        });
     }
 }

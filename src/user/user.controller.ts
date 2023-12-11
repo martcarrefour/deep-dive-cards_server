@@ -7,7 +7,7 @@ import {
     NotFoundException,
     Param,
     ParseUUIDPipe,
-    Put,
+    Patch,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
@@ -16,7 +16,7 @@ import { UserResponse } from './responses';
 import { JwtPayload } from '@auth/interfaces';
 import { RolesGuard } from '@auth/guards/role.guard';
 import { CurrentUser, Roles } from '@common/decorators';
-import { Role, User } from '@prisma/client';
+import { UserRole, User } from '@prisma/client';
 
 @Controller('user')
 export class UserController {
@@ -24,15 +24,15 @@ export class UserController {
 
     @UseInterceptors(ClassSerializerInterceptor)
     @UseGuards(RolesGuard)
-    @Roles(Role.USER)
+    @Roles(UserRole.USER)
     @Get('me')
     async me(@CurrentUser() user: JwtPayload) {
-        const me = await this.userService.findOne(user.email);
+        const me = await this.userService.findByEmailOrId(user.email);
         return new UserResponse(me);
     }
 
     @UseInterceptors(ClassSerializerInterceptor)
-    @Put()
+    @Patch()
     async updateUser(@Body() body: Partial<User>) {
         const user = await this.userService.create(body);
         return new UserResponse(user);
@@ -41,7 +41,8 @@ export class UserController {
     @UseInterceptors(ClassSerializerInterceptor)
     @Get(':idOrEmail')
     async findOneUser(@Param('idOrEmail') idOrEmail: string) {
-        const user = await this.userService.findOne(idOrEmail);
+        console.log('gi');
+        const user = await this.userService.findByEmailOrId(idOrEmail);
         if (!user) {
             return new NotFoundException();
         }

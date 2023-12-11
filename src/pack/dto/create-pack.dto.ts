@@ -1,7 +1,8 @@
 import { Tag } from '@prisma/client';
-import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreatePackDto {
+    @IsNotEmpty()
     @IsString()
     title: string;
 
