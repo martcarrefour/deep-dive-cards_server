@@ -23,7 +23,7 @@ import { UserResponse } from '@user/responses';
 import { GoogleGuard } from './guards/google.guard';
 import { BASE_URL } from './config';
 import { HttpService } from '@nestjs/axios';
-import { map, mergeMap, tap } from 'rxjs';
+import { map, mergeMap } from 'rxjs';
 import { handleTimeoutAndErrors } from '@common/helpers';
 import { YandexGuard } from './guards/yandex.guard';
 import { AuthProvider } from '@prisma/client';

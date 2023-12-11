@@ -5,7 +5,6 @@ import { CreatePackDto } from './dto';
 import { PrismaService } from '@prisma/prisma.service';
 import { JwtPayload } from '@auth/interfaces';
 import { Pack } from '@prisma/client';
-import { isPublic } from '@common/decorators';
 
 @Injectable()
 export class PackService {
@@ -29,6 +28,9 @@ export class PackService {
     async findAll(user: JwtPayload) {
         const packs = await this.prismaService.pack.findMany({
             where: { userId: user.id },
+            include: {
+                tags: true,
+            },
         });
         return packs;
     }
@@ -37,19 +39,21 @@ export class PackService {
     async findById(id: number, user: JwtPayload): Promise<Pack> {
         const pack = await this.prismaService.pack.findFirst({
             where: { id: id, userId: user.id },
+            include: {
+                tags: true,
+            },
         });
         return pack;
     }
 
     async update(id: number, { title, isPublic, tags }: UpdatePackDto, user: JwtPayload) {
-        console.log(tags);
         const updatedPack = await this.prismaService.pack.upsert({
-            where: { id: id, userId: user.id },
+            where: { id, userId: user.id },
             update: {
-                title: title,
-                isPublic: isPublic,
+                title: title ?? undefined,
+                isPublic: isPublic ?? undefined,
                 tags: {
-                    set: tags,
+                    set: tags ?? undefined,
                 },
             },
             create: {
@@ -71,7 +75,7 @@ export class PackService {
         const pack = await this.findById(id, user);
 
         if (!pack) {
-            return new NotFoundException();
+            throw new NotFoundException();
         }
 
         return await this.prismaService.pack.delete({

@@ -1,26 +1,84 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
+import { PrismaService } from '@prisma/prisma.service';
 
 @Injectable()
 export class CardService {
-    create(createCardDto: CreateCardDto) {
-        return 'This action adds a new card';
+    private readonly logger = new Logger(CardService.name);
+
+    constructor(private readonly prismaService: PrismaService) {}
+
+    async create({ question, answer, hint, level }: CreateCardDto, packId: number) {
+        const newCard = await this.prismaService.card.create({
+            data: {
+                question,
+                answer,
+                hint,
+                level,
+                packId,
+            },
+        });
+        return newCard;
     }
 
-    findAll() {
-        return `This action returns all card`;
+    async findAll(packId: number) {
+        const cards = await this.prismaService.card.findMany({
+            where: { packId },
+        });
+        return cards;
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} card`;
+    async findById(id: number, packId: number) {
+        const card = await this.prismaService.card.findFirst({
+            where: { id, packId },
+        });
+        if (!card) {
+            throw new NotFoundException('ggg');
+        }
+
+        return card;
     }
 
-    update(id: number, updateCardDto: UpdateCardDto) {
-        return `This action updates a #${id} card`;
+    async update(id: number, packId: number, { question, answer, hint, level }: UpdateCardDto) {
+        const card = await this.findById(id, packId);
+
+        if (!card) {
+            throw new NotFoundException();
+        }
+
+        const updatedCard = await this.prismaService.card.upsert({
+            where: { id, packId },
+            update: {
+                question: question ?? undefined,
+                answer: answer ?? undefined,
+                hint: hint ?? undefined,
+                level: level ?? undefined,
+            },
+            create: {
+                question: question,
+                answer: answer,
+                hint: hint,
+                level: level,
+                packId,
+            },
+        });
+
+        return updatedCard;
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} card`;
+    async delete(id: number, packId: number) {
+        const card = await this.findById(id, packId);
+
+        if (!card) {
+            throw new NotFoundException();
+        }
+
+        return await this.prismaService.card.delete({
+            where: {
+                id,
+                packId,
+            },
+        });
     }
 }

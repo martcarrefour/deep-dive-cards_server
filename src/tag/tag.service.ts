@@ -3,7 +3,6 @@ import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { PrismaService } from '@prisma/prisma.service';
 import { Tag } from '@prisma/client';
-import { title } from 'process';
 
 @Injectable()
 export class TagService {
@@ -14,12 +13,12 @@ export class TagService {
         const tag = await this.findByTitle(title);
 
         if (tag) {
-            return new ConflictException();
+            throw new ConflictException();
         }
 
         const newTag = await this.prismaService.tag.create({
             data: {
-                title: title,
+                title: title ?? undefined,
             },
         });
         return newTag;
@@ -41,7 +40,7 @@ export class TagService {
         const tag = await this.findByTitle(title);
 
         if (!tag) {
-            return new NotFoundException();
+            throw new NotFoundException();
         }
 
         const updatedTag = await this.prismaService.tag.update({
@@ -55,7 +54,7 @@ export class TagService {
         const tag = await this.findByTitle(title);
 
         if (!tag) {
-            return new NotFoundException();
+            throw new NotFoundException();
         }
 
         return await this.prismaService.tag.delete({

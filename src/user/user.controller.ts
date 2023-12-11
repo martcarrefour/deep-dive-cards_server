@@ -44,7 +44,7 @@ export class UserController {
         console.log('gi');
         const user = await this.userService.findByEmailOrId(idOrEmail);
         if (!user) {
-            return new NotFoundException();
+            throw new NotFoundException();
         }
         return new UserResponse(user);
     }
