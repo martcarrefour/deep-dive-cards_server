@@ -29,15 +29,20 @@ export class SessionService {
     }
 
     async findAll() {
-        return `This action returns all session`;
+        const sessions = await this.prismaService.session.findMany({ include: { pack: { include: { cards: true } } } });
+        return sessions;
     }
 
     async findOne(id: number) {
-        return `This action returns a #${id} session`;
+        const sessions = await this.prismaService.session.findUnique({
+            where: { id },
+            include: { pack: { include: { cards: true } } },
+        });
+        return sessions;
     }
 
     async update(id: number, updateSessionDto: UpdateSessionDto) {
-        return this.prismaService.session.update({where: })
+        return this.prismaService.session.update({ where: { id }, data: { depth: 10 } });
     }
 
     async remove(id: number) {

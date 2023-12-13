@@ -2,7 +2,7 @@ import { JWT_CONFIG } from '@auth/config';
 import { JwtPayload } from '@auth/interfaces';
 import { convertToSecondsUtil } from '@common/utils';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UserRole, User } from '@prisma/client';
 import { PrismaService } from '@prisma/prisma.service';
@@ -19,6 +19,14 @@ export class UserService {
 
     async create(user: Partial<User>) {
         const hashedPassword = user?.password ? this.hashPassword(user.password) : null;
+
+        const existingUser = await this.prismaService.user.findUnique({
+            where: { username: user.username },
+        });
+
+        if (existingUser && existingUser.id !== user.id) {
+            throw new ConflictException('Этот юзернейм уже существует');
+        }
 
         const createdUser = await this.prismaService.user.upsert({
             where: {
@@ -39,6 +47,7 @@ export class UserService {
                 username: user.username,
             },
         });
+
         await this.cacheManager.set(createdUser.id, createdUser);
         await this.cacheManager.set(createdUser.email, createdUser);
         return createdUser;

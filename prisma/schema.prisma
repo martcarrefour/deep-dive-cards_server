@@ -87,6 +87,7 @@ model Card {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // CardScore CardScore[]
+  Session Session[]
 
   @@map("cards")
 }
@@ -102,6 +103,8 @@ model Session {
   depth     Int      @default(0)
   // score       PackScore @relation(fields: [packScoreId], references: [id])
   // packScoreId Int      @map("pack_score_id")
+  Card      Card?    @relation(fields: [cardId], references: [id])
+  cardId    Int?
 
   @@map("sessions")
 }
