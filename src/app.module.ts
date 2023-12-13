@@ -10,6 +10,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { PackModule } from './pack/pack.module';
 import { CardModule } from './card/card.module';
 import { TagModule } from './tag/tag.module';
+import { SessionModule } from './session/session.module';
 
 @Module({
     imports: [
@@ -20,6 +21,7 @@ import { TagModule } from './tag/tag.module';
         PackModule,
         CardModule,
         TagModule,
+        SessionModule,
     ],
     controllers: [AppController],
     providers: [

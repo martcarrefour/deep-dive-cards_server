@@ -10,6 +10,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum AuthProvider {
+  GOOGLE
+  YANDEX
+}
+
 model User {
   id        String        @id @default(uuid())
   email     String        @unique
@@ -21,7 +31,9 @@ model User {
   roles     UserRole[]
   token     Token[]
   isBlocked Boolean       @default(false) @map("is_blocked")
-  Pack      Pack[]
+  packs     Pack[]
+  sessions  Session[]
+  // PackScore PackScore[]
 
   @@map("users")
 }
@@ -37,16 +49,18 @@ model Token {
 }
 
 model Pack {
-  id        Int      @id @default(autoincrement())
-  author    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String   @map("user_id")
+  id        Int       @id @default(autoincrement())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String    @map("user_id")
   title     String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  isPublic  Boolean  @default(false) @map("is_public")
-  rating    Decimal  @default(0)
-  card      Card[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  isPublic  Boolean   @default(false) @map("is_public")
+  rating    Decimal   @default(0)
+  cards     Card[]
   tags      Tag[]
+  sessions  Session[]
+  // PackScore PackScore[]
 
   @@map("packs")
 }
@@ -72,15 +86,49 @@ model Card {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  // CardScore CardScore[]
+
   @@map("cards")
 }
 
-enum UserRole {
-  ADMIN
-  USER
+model Session {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  pack      Pack     @relation(fields: [packId], references: [id])
+  packId    Int      @map("pack_id")
+  depth     Int      @default(0)
+  // score       PackScore @relation(fields: [packScoreId], references: [id])
+  // packScoreId Int      @map("pack_score_id")
+
+  @@map("sessions")
 }
 
-enum AuthProvider {
-  GOOGLE
-  YANDEX
-}
+// model PackScore {
+//   id           Int         @id @default(autoincrement())
+//   user         User        @relation(fields: [userId], references: [id])
+//   userId       String      @map("user_id")
+//   pack         Pack        @relation(fields: [packId], references: [id])
+//   cardsScores  CardScore[]
+//   sessionId    Int         @map("session_id")
+//   currentScore Int         @default(0) @map("current_score")
+//   maxScore     Int         @default(10) @map("max_score")
+//   packId       Int         @map("pack_id")
+//   Session      Session[]
+
+//   @@map("packs_scores")
+// }
+
+// model CardScore {
+//   id           Int       @id @default(autoincrement())
+//   card         Card      @relation(fields: [cardId], references: [id])
+//   cardId       Int       @map("card_id")
+//   score        PackScore @relation(fields: [scoreId], references: [id])
+//   scoreId      Int       @map("score_id")
+//   currentScore Int       @default(0) @map("current_score")
+//   maxScore     Int       @default(10) @map("max_score")
+
+//   @@map("cards_scores")
+// }

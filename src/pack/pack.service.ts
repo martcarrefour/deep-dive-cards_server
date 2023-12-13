@@ -26,7 +26,7 @@ export class PackService {
         const newPack = await this.prismaService.pack.create({
             data: {
                 title: createPackDto.title,
-                author: {
+                user: {
                     connect: {
                         id: user.id,
                     },
