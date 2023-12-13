@@ -65,12 +65,14 @@ export class AuthController {
 
     @Post('logout')
     async logout(@Cookie(REFRESH_TOKEN) refreshToken: string, @Res() res: Response) {
+        console.log(refreshToken);
         if (!refreshToken) {
             res.sendStatus(HttpStatus.OK);
             return;
         }
         await this.authService.deleteRefreshToken(refreshToken);
         res.cookie(REFRESH_TOKEN, '', { httpOnly: true, secure: true, expires: new Date() });
+
         res.sendStatus(HttpStatus.OK);
     }
 

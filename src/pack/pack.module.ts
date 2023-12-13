@@ -2,11 +2,12 @@ import { Module } from '@nestjs/common';
 import { PackService } from './pack.service';
 import { PackController } from './pack.controller';
 
-import { PrismaModule } from '@prisma/prisma.module';
+import { TagModule } from 'src/tag/tag.module';
 
 @Module({
     controllers: [PackController],
     providers: [PackService],
-    imports: [PrismaModule],
+    exports: [PackService],
+    imports: [TagModule],
 })
 export class PackModule {}

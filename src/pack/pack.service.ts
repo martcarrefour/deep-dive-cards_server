@@ -1,15 +1,26 @@
-import { ClassSerializerInterceptor, Injectable, Logger, NotFoundException, UseInterceptors } from '@nestjs/common';
+import {
+    ClassSerializerInterceptor,
+    ConflictException,
+    Injectable,
+    Logger,
+    NotFoundException,
+    UseInterceptors,
+} from '@nestjs/common';
 import { UpdatePackDto } from './dto/update-pack.dto';
 import { CreatePackDto } from './dto';
 
 import { PrismaService } from '@prisma/prisma.service';
 import { JwtPayload } from '@auth/interfaces';
 import { Pack } from '@prisma/client';
+import { TagService } from 'src/tag/tag.service';
 
 @Injectable()
 export class PackService {
     private readonly logger = new Logger(PackService.name);
-    constructor(private readonly prismaService: PrismaService) {}
+    constructor(
+        private readonly prismaService: PrismaService,
+        private readonly tagService: TagService,
+    ) {}
 
     async create(createPackDto: CreatePackDto, user: JwtPayload) {
         const newPack = await this.prismaService.pack.create({
@@ -47,6 +58,12 @@ export class PackService {
     }
 
     async update(id: number, { title, isPublic, tags }: UpdatePackDto, user: JwtPayload) {
+        const tagsIsValid = await this.tagService.checkTagsExisting(tags);
+
+        if (!tagsIsValid) {
+            throw new ConflictException('Invalid tags: at least one tag does not exist in the database');
+        }
+
         const updatedPack = await this.prismaService.pack.upsert({
             where: { id, userId: user.id },
             update: {
@@ -84,5 +101,25 @@ export class PackService {
                 userId: user.id,
             },
         });
+    }
+
+    async ownerId(id: number) {
+        const pack = await this.prismaService.pack.findUnique({
+            where: {
+                id,
+            },
+            select: {
+                author: {
+                    select: {
+                        id: true,
+                    },
+                },
+            },
+        });
+
+        if (!pack || !pack.author) {
+            return null;
+        }
+        return pack.author.id;
     }
 }

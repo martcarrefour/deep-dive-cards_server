@@ -63,4 +63,20 @@ export class TagService {
             },
         });
     }
+
+    async checkTagsExisting(tags: Tag[]) {
+        const existingTags = await this.prismaService.tag.findMany();
+
+        const tagsIsValid = tags.reduce((acc, tag) => {
+            const tagExists = existingTags.some((existingTag) => existingTag.title === tag.title);
+
+            if (!tagExists) {
+                return false;
+            }
+
+            return acc;
+        }, true);
+
+        return tagsIsValid;
+    }
 }

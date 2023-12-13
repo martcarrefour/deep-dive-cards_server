@@ -16,6 +16,8 @@ import { PrismaService } from '@prisma/prisma.service';
 import { v4 } from 'uuid';
 import { add } from 'date-fns';
 
+const BEARER = 'Bearer ';
+
 @Injectable()
 export class AuthService {
     private readonly logger = new Logger(AuthService.name);
@@ -50,7 +52,7 @@ export class AuthService {
     }
 
     async deleteRefreshToken(token: string) {
-        return this.prismaService.token.delete({ where: { token } });
+        return await this.prismaService.token.delete({ where: { token } });
     }
 
     async refreshTokens(refreshTokens: string, agent: string): Promise<Tokens> {
@@ -87,13 +89,11 @@ export class AuthService {
     }
 
     private async generateTokens(user: User, agent: string): Promise<Tokens> {
-        const accessToken =
-            'Bearer ' +
-            this.jwtService.sign({
-                id: user.id,
-                email: user.email,
-                roles: user.roles,
-            });
+        const accessToken = this.jwtService.sign({
+            id: user.id,
+            email: user.email,
+            roles: user.roles,
+        });
 
         const refreshToken = await this.getRefreshToken(user.id, agent);
 
@@ -109,7 +109,7 @@ export class AuthService {
         });
 
         //? SOME FIX const token = _token?.token ?? '';
-        const token = _token?.token ?? '';
+        const token = BEARER + _token?.token ?? '';
 
         return this.prismaService.token.upsert({
             where: { token },
