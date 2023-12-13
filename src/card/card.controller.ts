@@ -19,11 +19,6 @@ export class CardController {
         return this.cardService.findAll(packId);
     }
 
-    // @Get(':id/owner')
-    // findOwner(@Param('id', ParseIntPipe) id: number) {
-    //     return this.cardService.ownerId(id);
-    // }
-
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number, @Param('packId', ParseIntPipe) packId: number) {
         return this.cardService.findById(id, packId);

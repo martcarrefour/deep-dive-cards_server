@@ -82,32 +82,4 @@ export class CardService {
             },
         });
     }
-
-    // async ownerId(id: number) {
-    //     const card = await this.prismaService.card.findUniqueOrThrow({
-    //         where: {
-    //             id,
-    //         },
-    //         select: {
-    //             pack: {
-    //                 select: {
-    //                     author: {
-    //                         select: {
-    //                             id: true,
-    //                         },
-    //                     },
-    //                 },
-    //             },
-    //         },
-    //     });
-
-    //     // Проверка, что card.pack не равен null
-    //     if (card.pack) {
-    //         return card.pack.author.id;
-    //     } else {
-    //         // Обработка ситуации, когда pack равен null
-    //         // Например, выбросить ошибку или вернуть значение по умолчанию
-    //         throw new Error('Pack is null for the given card id');
-    //     }
-    // }
 }

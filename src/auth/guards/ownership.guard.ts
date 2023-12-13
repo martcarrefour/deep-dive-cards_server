@@ -9,12 +9,13 @@ export class OwnershipGuard implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const packId = +context.getArgs()[0].params.packId;
         const user = context.switchToHttp().getRequest().user;
-        const packOwnerId = await this.packService.ownerId(packId);
 
-        if (!packOwnerId || user.id !== packOwnerId) {
+        const pack = await this.packService.findById(packId, user);
+
+        if (!pack || user.id !== pack.userId) {
             throw new ForbiddenException("You do not have permission to access this user's data");
         }
 
-        return user.id === packOwnerId;
+        return user.id === pack.userId;
     }
 }

@@ -31,6 +31,12 @@ export class PackController {
         return this.packService.findAll(user);
     }
 
+    @Get(':id/owner')
+    async owner(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: JwtPayload) {
+        const ownerId = await this.packService.findById(id, user);
+        return ownerId;
+    }
+
     @Get(':id')
     async findById(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: JwtPayload) {
         const pack = await this.packService.findById(id, user);

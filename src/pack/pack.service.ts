@@ -47,7 +47,7 @@ export class PackService {
     }
 
     @UseInterceptors(ClassSerializerInterceptor)
-    async findById(id: number, user: JwtPayload): Promise<Pack> {
+    async findById(id: number, user?: JwtPayload): Promise<Pack> {
         const pack = await this.prismaService.pack.findFirst({
             where: { id: id, userId: user.id },
             include: {
@@ -101,25 +101,5 @@ export class PackService {
                 userId: user.id,
             },
         });
-    }
-
-    async ownerId(id: number) {
-        const pack = await this.prismaService.pack.findUnique({
-            where: {
-                id,
-            },
-            select: {
-                author: {
-                    select: {
-                        id: true,
-                    },
-                },
-            },
-        });
-
-        if (!pack || !pack.author) {
-            return null;
-        }
-        return pack.author.id;
     }
 }
