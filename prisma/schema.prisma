@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -20,20 +17,25 @@ enum AuthProvider {
   YANDEX
 }
 
+enum UserAnswer {
+  KNOW
+  DONT_KNOW
+  NOT_SURE
+}
+
 model User {
-  id        String        @id @default(uuid())
-  email     String        @unique
-  username  String?       @unique
-  password  String?
-  provider  AuthProvider?
-  createdAt DateTime      @default(now()) @map("created_at")
-  updatedAt DateTime      @updatedAt @map("updated_at")
-  roles     UserRole[]
-  token     Token[]
-  isBlocked Boolean       @default(false) @map("is_blocked")
-  packs     Pack[]
-  sessions  Session[]
-  // PackScore PackScore[]
+  id           String        @id @default(uuid())
+  email        String        @unique
+  username     String?       @unique
+  password     String?
+  provider     AuthProvider?
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  roles        UserRole[]
+  token        Token[]
+  isBlocked    Boolean       @default(false) @map("is_blocked")
+  packs        Pack[]
+  StudySession Session[]
 
   @@map("users")
 }
@@ -49,18 +51,17 @@ model Token {
 }
 
 model Pack {
-  id        Int       @id @default(autoincrement())
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String    @map("user_id")
-  title     String
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  isPublic  Boolean   @default(false) @map("is_public")
-  rating    Decimal   @default(0)
-  cards     Card[]
-  tags      Tag[]
-  sessions  Session[]
-  // PackScore PackScore[]
+  id           Int       @id @default(autoincrement())
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String    @map("user_id")
+  title        String
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  isPublic     Boolean   @default(false) @map("is_public")
+  rating       Decimal   @default(0)
+  cards        Card[]
+  tags         Tag[]
+  StudySession Session[]
 
   @@map("packs")
 }
@@ -76,62 +77,42 @@ model Tag {
 }
 
 model Card {
-  id        Int      @id @default(autoincrement())
-  pack      Pack     @relation(fields: [packId], references: [id])
-  packId    Int      @map("pack_id")
-  question  String
-  answer    String
-  hint      String?
-  level     Int?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  // CardScore CardScore[]
-  Session Session[]
+  id              Int      @id @default(autoincrement())
+  pack            Pack     @relation(fields: [packId], references: [id])
+  packId          Int      @map("pack_id")
+  question        String
+  answer          String
+  hint            String?
+  difficultyLevel Int      @default(1)
+  parent          Card[]   @relation("ChildToParent")
+  children        Card[]   @relation("ChildToParent")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  SessionResult   Result[]
 
   @@map("cards")
 }
 
 model Session {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String   @map("user_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  pack      Pack     @relation(fields: [packId], references: [id])
-  packId    Int      @map("pack_id")
-  depth     Int      @default(0)
-  // score       PackScore @relation(fields: [packScoreId], references: [id])
-  // packScoreId Int      @map("pack_score_id")
-  Card      Card?    @relation(fields: [cardId], references: [id])
-  cardId    Int?
+  id            Int      @id @default(autoincrement())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String   @map("user_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  pack          Pack     @relation(fields: [packId], references: [id])
+  packId        Int      @map("pack_id")
+  sessionResult Result[]
 
-  @@map("sessions")
+  @@map("study_sessions")
 }
 
-// model PackScore {
-//   id           Int         @id @default(autoincrement())
-//   user         User        @relation(fields: [userId], references: [id])
-//   userId       String      @map("user_id")
-//   pack         Pack        @relation(fields: [packId], references: [id])
-//   cardsScores  CardScore[]
-//   sessionId    Int         @map("session_id")
-//   currentScore Int         @default(0) @map("current_score")
-//   maxScore     Int         @default(10) @map("max_score")
-//   packId       Int         @map("pack_id")
-//   Session      Session[]
+model Result {
+  id         Int         @id @default(autoincrement())
+  sessionId  Int
+  session    Session     @relation(fields: [sessionId], references: [id])
+  cardId     Int
+  card       Card        @relation(fields: [cardId], references: [id])
+  userAnswer UserAnswer?
+  usedHint   Boolean     @default(false)
 
-//   @@map("packs_scores")
-// }
-
-// model CardScore {
-//   id           Int       @id @default(autoincrement())
-//   card         Card      @relation(fields: [cardId], references: [id])
-//   cardId       Int       @map("card_id")
-//   score        PackScore @relation(fields: [scoreId], references: [id])
-//   scoreId      Int       @map("score_id")
-//   currentScore Int       @default(0) @map("current_score")
-//   maxScore     Int       @default(10) @map("max_score")
-
-//   @@map("cards_scores")
-// }
+  @@map("session_results")
+}
