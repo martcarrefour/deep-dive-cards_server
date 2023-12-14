@@ -5,7 +5,7 @@ import { UpdateCardDto } from './dto/update-card.dto';
 import { OwnershipGuard } from '@auth/guards/ownership.guard';
 
 @UseGuards(OwnershipGuard)
-@Controller(':packId/card')
+@Controller('packs/:packId/card')
 export class CardController {
     constructor(private readonly cardService: CardService) {}
 

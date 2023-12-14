@@ -4,12 +4,6 @@ import { UpdateSessionDto } from './dto/update-session.dto';
 import { PrismaService } from '@prisma/prisma.service';
 import { JwtPayload } from '@auth/interfaces';
 
-// userId
-// packId
-// depth
-// score
-// packScoreId
-
 @Injectable()
 export class SessionService {
     constructor(private readonly prismaService: PrismaService) {}

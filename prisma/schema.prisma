@@ -77,18 +77,18 @@ model Tag {
 }
 
 model Card {
-  id              Int      @id @default(autoincrement())
-  pack            Pack     @relation(fields: [packId], references: [id])
-  packId          Int      @map("pack_id")
-  question        String
-  answer          String
-  hint            String?
-  difficultyLevel Int      @default(1)
-  parents         Card[]   @relation("ChildToParent")
-  childrens       Card[]   @relation("ChildToParent")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
-  results         Result[]
+  id         Int      @id @default(autoincrement())
+  pack       Pack     @relation(fields: [packId], references: [id])
+  packId     Int      @map("pack_id")
+  question   String
+  answer     String
+  hint       String?
+  difficulty Int      @default(1)
+  parents    Card[]   @relation("ChildToParent")
+  childrens  Card[]   @relation("ChildToParent")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  results    Result[]
 
   @@map("cards")
 }

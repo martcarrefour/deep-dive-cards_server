@@ -1,26 +1,52 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateResultDto } from './dto/create-result.dto';
 import { UpdateResultDto } from './dto/update-result.dto';
+import { Result } from '@prisma/client';
+import { PrismaService } from '@prisma/prisma.service';
 
 @Injectable()
 export class ResultService {
-    create(createResultDto: CreateResultDto) {
-        return 'This action adds a new result';
+    constructor(private readonly prismaService: PrismaService) {}
+    async create(createResultDto: CreateResultDto): Promise<Result> {
+        const newResult = await this.prismaService.result.create({
+            data: createResultDto,
+        });
+        return newResult;
     }
 
-    findAll() {
-        return `This action returns all result`;
+    async findAll(): Promise<Result[]> {
+        const results = await this.prismaService.result.findMany();
+        return results;
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} result`;
+    async findOne(id: number): Promise<Result> {
+        const result = await this.prismaService.result.findUnique({
+            where: { id },
+        });
+
+        if (!result) {
+            throw new NotFoundException(`Result with ID ${id} not found.`);
+        }
+
+        return result;
     }
 
-    update(id: number, updateResultDto: UpdateResultDto) {
-        return `This action updates a #${id} result`;
+    async update(id: number, updateResultDto: UpdateResultDto): Promise<Result> {
+        await this.findOne(id);
+
+        const updatedResult = await this.prismaService.result.update({
+            where: { id },
+            data: updateResultDto,
+        });
+
+        return updatedResult;
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} result`;
+    async remove(id: number): Promise<void> {
+        await this.findOne(id);
+
+        await this.prismaService.result.delete({
+            where: { id },
+        });
     }
 }
