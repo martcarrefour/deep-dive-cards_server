@@ -94,13 +94,14 @@ model Card {
 }
 
 model Session {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String   @map("user_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  pack      Pack     @relation(fields: [packId], references: [id])
-  packId    Int      @map("pack_id")
-  results   Result[]
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String   @map("user_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  pack       Pack     @relation(fields: [packId], references: [id])
+  packId     Int      @map("pack_id")
+  results    Result[]
+  difficulty Int      @default(1)
 
   @@map("sessions")
 }

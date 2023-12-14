@@ -3,6 +3,7 @@ import { CreateSessionDto } from './dto/create-session.dto';
 import { UpdateSessionDto } from './dto/update-session.dto';
 import { PrismaService } from '@prisma/prisma.service';
 import { JwtPayload } from '@auth/interfaces';
+import { Card, Result, Session, UserAnswer } from '@prisma/client';
 
 @Injectable()
 export class SessionService {
@@ -27,11 +28,10 @@ export class SessionService {
         });
     }
 
-    async findOne(id: number, user: JwtPayload) {
+    async findOne(id: number) {
         const session = await this.prismaService.session.findUnique({
             where: {
                 id,
-                userId: user.id,
             },
         });
 
@@ -61,5 +61,49 @@ export class SessionService {
         });
 
         return `Session with ID ${deletedSession.id} has been deleted.`;
+    }
+
+    async getResultsForSession(sessionId: number): Promise<Result[]> {
+        const session = await this.findOne(sessionId);
+
+        if (!session) {
+            throw new Error('Session not found');
+        }
+
+        return this.prismaService.result.findMany({
+            where: {
+                sessionId,
+            },
+        });
+    }
+
+    async updateSessionDifficulty(session: Session, userAnswer: UserAnswer): Promise<void> {
+        let updatedDifficulty = session.difficulty;
+
+        switch (userAnswer) {
+            case UserAnswer.KNOW:
+                updatedDifficulty += 1;
+                break;
+
+            case UserAnswer.DONT_KNOW:
+                break;
+
+            case UserAnswer.NOT_SURE:
+                updatedDifficulty += 0.25;
+                break;
+
+            default:
+                console.warn(`Unhandled UserAnswer value: ${userAnswer}`);
+                break;
+        }
+
+        await this.prismaService.session.update({
+            where: {
+                id: session.id,
+            },
+            data: {
+                difficulty: updatedDifficulty,
+            },
+        });
     }
 }

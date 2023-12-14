@@ -7,7 +7,7 @@ import { JwtPayload } from '@auth/interfaces';
 import { OwnershipGuard } from '@auth/guards/ownership.guard';
 
 @UseGuards(OwnershipGuard)
-@Controller(':packId/session')
+@Controller('packs/:packId/session')
 export class SessionController {
     constructor(private readonly sessionService: SessionService) {}
 
@@ -26,8 +26,8 @@ export class SessionController {
     }
 
     @Get(':id')
-    findOne(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: JwtPayload) {
-        return this.sessionService.findOne(id, user);
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.sessionService.findOne(id);
     }
 
     @Patch(':id')
