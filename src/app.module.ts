@@ -11,6 +11,7 @@ import { PackModule } from './pack/pack.module';
 import { CardModule } from './card/card.module';
 import { TagModule } from './tag/tag.module';
 import { SessionModule } from './session/session.module';
+import { ResultModule } from './result/result.module';
 
 @Module({
     imports: [
@@ -22,6 +23,7 @@ import { SessionModule } from './session/session.module';
         CardModule,
         TagModule,
         SessionModule,
+        ResultModule,
     ],
     controllers: [AppController],
     providers: [

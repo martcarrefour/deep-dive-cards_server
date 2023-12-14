@@ -24,18 +24,18 @@ enum UserAnswer {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  username     String?       @unique
-  password     String?
-  provider     AuthProvider?
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  roles        UserRole[]
-  token        Token[]
-  isBlocked    Boolean       @default(false) @map("is_blocked")
-  packs        Pack[]
-  StudySession Session[]
+  id        String        @id @default(uuid())
+  email     String        @unique
+  username  String?       @unique
+  password  String?
+  provider  AuthProvider?
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+  roles     UserRole[]
+  tokens    Token[]
+  isBlocked Boolean       @default(false) @map("is_blocked")
+  packs     Pack[]
+  sessions  Session[]
 
   @@map("users")
 }
@@ -51,17 +51,17 @@ model Token {
 }
 
 model Pack {
-  id           Int       @id @default(autoincrement())
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId       String    @map("user_id")
-  title        String
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
-  isPublic     Boolean   @default(false) @map("is_public")
-  rating       Decimal   @default(0)
-  cards        Card[]
-  tags         Tag[]
-  StudySession Session[]
+  id        Int       @id @default(autoincrement())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String    @map("user_id")
+  title     String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  isPublic  Boolean   @default(false) @map("is_public")
+  rating    Decimal   @default(0)
+  cards     Card[]
+  tags      Tag[]
+  sessions  Session[]
 
   @@map("packs")
 }
@@ -84,25 +84,25 @@ model Card {
   answer          String
   hint            String?
   difficultyLevel Int      @default(1)
-  parent          Card[]   @relation("ChildToParent")
-  children        Card[]   @relation("ChildToParent")
+  parents         Card[]   @relation("ChildToParent")
+  childrens       Card[]   @relation("ChildToParent")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
-  SessionResult   Result[]
+  results         Result[]
 
   @@map("cards")
 }
 
 model Session {
-  id            Int      @id @default(autoincrement())
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId        String   @map("user_id")
-  createdAt     DateTime @default(now()) @map("created_at")
-  pack          Pack     @relation(fields: [packId], references: [id])
-  packId        Int      @map("pack_id")
-  sessionResult Result[]
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  pack      Pack     @relation(fields: [packId], references: [id])
+  packId    Int      @map("pack_id")
+  results   Result[]
 
-  @@map("study_sessions")
+  @@map("sessions")
 }
 
 model Result {
@@ -114,5 +114,5 @@ model Result {
   userAnswer UserAnswer?
   usedHint   Boolean     @default(false)
 
-  @@map("session_results")
+  @@map("results")
 }

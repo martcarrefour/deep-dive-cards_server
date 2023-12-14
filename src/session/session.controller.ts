@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { SessionService } from './session.service';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { UpdateSessionDto } from './dto/update-session.dto';
 import { CurrentUser } from '@common/decorators';
 import { JwtPayload } from '@auth/interfaces';
+import { OwnershipGuard } from '@auth/guards/ownership.guard';
 
+@UseGuards(OwnershipGuard)
 @Controller(':packId/session')
 export class SessionController {
     constructor(private readonly sessionService: SessionService) {}

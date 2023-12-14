@@ -29,6 +29,7 @@ export class SessionService {
             where: {
                 userId: userId.id,
             },
+            include: { results: true },
         });
     }
 
