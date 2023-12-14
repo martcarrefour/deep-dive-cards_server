@@ -19,13 +19,13 @@ export class SessionController {
     }
 
     @Get()
-    findAll() {
-        return this.sessionService.findAll();
+    findAll(@CurrentUser() user: JwtPayload) {
+        return this.sessionService.findAll(user);
     }
 
     @Get(':id')
-    findOne(@Param('id', ParseIntPipe) id: number) {
-        return this.sessionService.findOne(id);
+    findOne(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: JwtPayload) {
+        return this.sessionService.findOne(id, user);
     }
 
     @Patch(':id')

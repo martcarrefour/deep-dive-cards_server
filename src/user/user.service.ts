@@ -20,8 +20,8 @@ export class UserService {
     async create(user: Partial<User>) {
         const hashedPassword = user?.password ? this.hashPassword(user.password) : null;
 
-        const existingUser = await this.prismaService.user.findUnique({
-            where: { username: user.username },
+        const existingUser = await this.prismaService.user.findFirst({
+            where: { username: user?.username },
         });
 
         if (existingUser && existingUser.id !== user.id) {
@@ -37,7 +37,7 @@ export class UserService {
                 provider: user?.provider ?? undefined,
                 roles: user?.roles ?? undefined,
                 isBlocked: user.isBlocked ?? undefined,
-                username: user.username ?? undefined,
+                username: user?.username ?? undefined,
             },
             create: {
                 email: user.email,

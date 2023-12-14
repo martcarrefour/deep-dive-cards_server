@@ -1,7 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { Pack } from '@prisma/client';
+import { IsInt, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateCardDto {
+    @ApiProperty()
+    @IsNumber()
+    @IsNotEmpty()
+    packId: number;
+
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
