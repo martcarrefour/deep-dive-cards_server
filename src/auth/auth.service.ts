@@ -1,8 +1,10 @@
 import {
+    BadRequestException,
     ConflictException,
     HttpException,
     HttpStatus,
     Injectable,
+    InternalServerErrorException,
     Logger,
     UnauthorizedException,
 } from '@nestjs/common';
@@ -66,26 +68,32 @@ export class AuthService {
     }
 
     async providerAuth(email: string, agent: string, provider: AuthProvider) {
-        const userExist = await this.userService.findByEmailOrId(email);
-        if (userExist) {
-            const user = await this.userService.create({ email, provider }).catch((err) => {
-                this.logger.error(err);
-                return null;
-            });
-            return this.generateTokens(user, agent);
+        // Валидация параметров
+        if (!email || !agent || !provider) {
+            throw new BadRequestException('Некорректные входные параметры');
         }
-        const user = await this.userService.create({ email, provider }).catch((err) => {
+
+        try {
+            const userExist = await this.userService.findByEmailOrId(email);
+
+            if (userExist) {
+                return this.generateTokens(userExist, agent);
+            }
+
+            const newUser = await this.userService.create({ email, provider });
+
+            // Генерация токенов для нового пользователя и возвращаем
+            return this.generateTokens(newUser, agent);
+        } catch (err) {
+            // Обработка ошибок
             this.logger.error(err);
-            return null;
-        });
-        if (!user) {
-            //? Поправить везде exeption
-            throw new HttpException(
-                `Не получилось создать пользователя с email ${email} в ${provider}`,
-                HttpStatus.BAD_REQUEST,
-            );
+
+            if (err instanceof ConflictException) {
+                throw err; // Пробрасываем конфликт, если он уже обработан
+            }
+
+            throw new InternalServerErrorException('Произошла ошибка при обработке запроса');
         }
-        return this.generateTokens(user, agent);
     }
 
     private async generateTokens(user: User, agent: string): Promise<Tokens> {

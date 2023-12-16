@@ -15,7 +15,10 @@ import { UserResponse } from './responses';
 import { JwtPayload } from '@auth/interfaces';
 import { CurrentUser } from '@common/decorators';
 import { User } from '@prisma/client';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('user')
 @Controller('user')
 export class UserController {
     constructor(private readonly userService: UserService) {}

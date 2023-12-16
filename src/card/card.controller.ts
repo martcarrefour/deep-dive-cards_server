@@ -3,7 +3,10 @@ import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { OwnershipGuard } from '@auth/guards/ownership.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('card')
 @UseGuards(OwnershipGuard)
 @Controller('packs/:packId/card')
 export class CardController {
@@ -20,8 +23,8 @@ export class CardController {
     }
 
     @Get(':id')
-    findOne(@Param('id', ParseIntPipe) id: number, @Param('packId', ParseIntPipe) packId: number) {
-        return this.cardService.findById(id, packId);
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.cardService.findById(id);
     }
 
     @Patch(':id')
@@ -34,7 +37,7 @@ export class CardController {
     }
 
     @Delete(':id')
-    delete(@Param('id', ParseIntPipe) id: number, @Param('packId', ParseIntPipe) packId: number) {
-        return this.cardService.delete(id, packId);
+    delete(@Param('id', ParseIntPipe) id: number) {
+        return this.cardService.delete(id);
     }
 }

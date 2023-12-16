@@ -5,7 +5,10 @@ import { UpdateSessionDto } from './dto/update-session.dto';
 import { CurrentUser } from '@common/decorators';
 import { JwtPayload } from '@auth/interfaces';
 import { OwnershipGuard } from '@auth/guards/ownership.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('session')
 @UseGuards(OwnershipGuard)
 @Controller('packs/:packId/session')
 export class SessionController {

@@ -15,7 +15,10 @@ import { CreatePackDto } from './dto/create-pack.dto';
 import { UpdatePackDto } from './dto/update-pack.dto';
 import { CurrentUser } from '@common/decorators';
 import { JwtPayload } from '@auth/interfaces';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('pack')
 @Controller('pack')
 export class PackController {
     constructor(private readonly packService: PackService) {}

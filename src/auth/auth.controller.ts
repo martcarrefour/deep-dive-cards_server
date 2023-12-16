@@ -27,11 +27,13 @@ import { map, mergeMap } from 'rxjs';
 import { handleTimeoutAndErrors } from '@common/helpers';
 import { YandexGuard } from './guards/yandex.guard';
 import { AuthProvider } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
 const REFRESH_TOKEN = 'refreshtoken';
 
 @Public()
 @Controller('auth')
+@ApiTags('auth')
 export class AuthController {
     constructor(
         private readonly authService: AuthService,

@@ -22,9 +22,9 @@ export class CardService {
         });
     }
 
-    async findById(id: number, packId: number): Promise<Card> {
+    async findById(id: number): Promise<Card> {
         const card = await this.prismaService.card.findFirst({
-            where: { id, packId },
+            where: { id },
         });
 
         if (!card) {
@@ -35,7 +35,7 @@ export class CardService {
     }
 
     async update(id: number, packId: number, { question, answer, hint }: UpdateCardDto) {
-        await this.findById(id, packId);
+        await this.findById(id);
 
         return await this.prismaService.card.upsert({
             where: { id, packId },
@@ -53,11 +53,11 @@ export class CardService {
         });
     }
 
-    async delete(id: number, packId: number): Promise<void> {
-        await this.findById(id, packId);
+    async delete(id: number): Promise<void> {
+        await this.findById(id);
 
         await this.prismaService.card.delete({
-            where: { id, packId },
+            where: { id },
         });
     }
 }

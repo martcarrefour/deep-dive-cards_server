@@ -19,14 +19,14 @@ export class UserService {
 
     async create(user: Partial<User>) {
         const hashedPassword = user?.password ? this.hashPassword(user.password) : null;
+        console.log(user.username);
 
-        const existingUser = await this.prismaService.user.findFirst({
-            where: { username: user?.username },
-        });
-
-        if (existingUser && existingUser.id !== user.id) {
-            throw new ConflictException('Этот юзернейм уже существует');
+        const existingUsername = await this.findByUsername(user.username);
+        console.log(existingUsername);
+        if (existingUsername) {
+            throw new ConflictException('Username занят');
         }
+        console.log(existingUsername);
 
         const createdUser = await this.prismaService.user.upsert({
             where: {
@@ -72,6 +72,31 @@ export class UserService {
             }
 
             await this.cacheManager.set(idOrEmail, user, convertToSecondsUtil(this.configService.get(JWT_CONFIG.EXP)));
+            return user;
+        }
+        return user;
+    }
+    async findByUsername(username: string, isReset = false): Promise<User> {
+        if (!username) {
+            return null;
+        }
+
+        if (isReset) {
+            await this.cacheManager.del(username);
+        }
+
+        const user = await this.cacheManager.get<User>(username);
+
+        if (!user) {
+            const user = await this.prismaService.user.findFirst({
+                where: { username },
+            });
+
+            if (!user) {
+                return null;
+            }
+
+            await this.cacheManager.set(username, user, convertToSecondsUtil(this.configService.get(JWT_CONFIG.EXP)));
             return user;
         }
         return user;

@@ -5,7 +5,9 @@ import { UpdateTagDto } from './dto/update-tag.dto';
 import { RolesGuard } from '@auth/guards/role.guard';
 import { Roles } from '@common/decorators';
 import { UserRole } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('tag')
 @UseGuards(RolesGuard)
 @Controller('tag')
 export class TagController {

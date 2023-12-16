@@ -3,13 +3,21 @@ import { CreateResultDto } from './dto/create-result.dto';
 import { UpdateResultDto } from './dto/update-result.dto';
 import { Result } from '@prisma/client';
 import { PrismaService } from '@prisma/prisma.service';
+import { CardService } from 'src/card/card.service';
 
 @Injectable()
 export class ResultService {
-    constructor(private readonly prismaService: PrismaService) {}
-    async create(createResultDto: CreateResultDto): Promise<Result> {
+    constructor(
+        private readonly prismaService: PrismaService,
+        private readonly cardService: CardService,
+    ) {}
+    async create(createResultDto: CreateResultDto, sessionId: number): Promise<Result> {
+        const cardRes = await this.cardService.findById(createResultDto.cardId);
+        if (!cardRes) {
+            throw cardRes;
+        }
         const newResult = await this.prismaService.result.create({
-            data: createResultDto,
+            data: { ...createResultDto, sessionId },
         });
         return newResult;
     }
@@ -32,7 +40,11 @@ export class ResultService {
     }
 
     async update(id: number, updateResultDto: UpdateResultDto): Promise<Result> {
-        await this.findOne(id);
+        const resultRes = await this.findOne(id);
+
+        if (!resultRes) {
+            throw resultRes;
+        }
 
         const updatedResult = await this.prismaService.result.update({
             where: { id },

@@ -1,15 +1,30 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    ParseIntPipe,
+    ValidationPipe,
+    UsePipes,
+} from '@nestjs/common';
 import { ResultService } from './result.service';
 import { CreateResultDto } from './dto/create-result.dto';
 import { UpdateResultDto } from './dto/update-result.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('result')
+@UsePipes(new ValidationPipe())
 @Controller('sessions/:sessionId/results')
 export class ResultController {
     constructor(private readonly resultService: ResultService) {}
 
     @Post()
-    create(@Body() createResultDto: CreateResultDto) {
-        return this.resultService.create(createResultDto);
+    create(@Body() createResultDto: CreateResultDto, @Param('sessionId', ParseIntPipe) sessionId: number) {
+        return this.resultService.create(createResultDto, sessionId);
     }
 
     @Get()
@@ -22,6 +37,7 @@ export class ResultController {
         return this.resultService.findOne(id);
     }
 
+    @UsePipes(new ValidationPipe())
     @Patch(':id')
     update(@Param('id', ParseIntPipe) id: number, @Body() updateResultDto: UpdateResultDto) {
         return this.resultService.update(id, updateResultDto);
