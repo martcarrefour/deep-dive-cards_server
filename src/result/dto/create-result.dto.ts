@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { $Enums } from '@prisma/client';
-import { IsNumber, IsNotEmpty, IsString, IsBoolean, IsOptional, IsEnum } from 'class-validator';
+import { IsNotEmpty, IsString, IsBoolean, IsOptional, IsEnum, IsInt } from 'class-validator';
 
 export class CreateResultDto {
     @ApiProperty()
-    @IsNumber()
+    @IsInt()
     @IsNotEmpty()
     cardId: number;
 

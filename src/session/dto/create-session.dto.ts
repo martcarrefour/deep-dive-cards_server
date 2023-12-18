@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsInt } from 'class-validator';
+import { IsString, IsNotEmpty, IsInt, IsOptional, IsNumber } from 'class-validator';
 
 export class CreateSessionDto {
     @ApiProperty()
@@ -11,4 +11,9 @@ export class CreateSessionDto {
     @IsInt()
     @IsNotEmpty()
     packId: number;
+
+    @ApiProperty({ required: false })
+    @IsInt()
+    @IsOptional()
+    difficulty?: number;
 }

@@ -1,22 +1,29 @@
-import { $Enums, User } from '@prisma/client';
-import { Exclude } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, IsEnum } from 'class-validator';
+import { UserRole, AuthProvider } from '@prisma/client';
 
-export class UserResponse implements User {
-    id: string;
+export class CreateUserDto {
+    @ApiProperty()
+    @IsEmail()
     email: string;
-    @Exclude()
+
+    @ApiProperty({ required: false })
+    @IsString()
+    @IsOptional()
+    username?: string;
+
+    @ApiProperty()
+    @IsString()
+    @IsNotEmpty()
     password: string;
-    createdAt: Date;
-    updatedAt: Date;
-    roles: $Enums.UserRole[];
 
-    constructor(user: User) {
-        Object.assign(this, user);
-    }
-    username: string;
-    @Exclude()
-    isBlocked: boolean;
+    @ApiProperty({ required: false })
+    @IsEnum(UserRole, { each: true })
+    @IsOptional()
+    roles?: UserRole[];
 
-    @Exclude()
-    provider: $Enums.AuthProvider;
+    @ApiProperty({ required: false })
+    @IsEnum(AuthProvider)
+    @IsOptional()
+    provider?: AuthProvider;
 }
