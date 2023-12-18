@@ -45,6 +45,6 @@ export class ResultController {
 
     @Delete(':id')
     remove(@Param('id', ParseIntPipe) id: number) {
-        return this.resultService.remove(id);
+        return this.resultService.delete(id);
     }
 }

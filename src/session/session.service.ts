@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-
 import { PrismaService } from '@prisma/prisma.service';
 import { JwtPayload } from '@auth/interfaces';
 import { Result, Session, UserAnswer } from '@prisma/client';
@@ -8,18 +7,20 @@ import { CreateSessionDto, UpdateSessionDto } from './dto';
 @Injectable()
 export class SessionService {
     constructor(private readonly prismaService: PrismaService) {}
-    async create(session: CreateSessionDto, user: JwtPayload, packId: number) {
+
+    async create(session: CreateSessionDto, user: JwtPayload, packId: number): Promise<Session> {
         const newSession = await this.prismaService.session.create({
             data: {
                 userId: user.id,
                 packId: packId,
+                ...session,
             },
         });
 
         return newSession;
     }
 
-    async findAll(userId: JwtPayload) {
+    async findAll(userId: JwtPayload): Promise<Session[]> {
         return this.prismaService.session.findMany({
             where: {
                 userId: userId.id,
@@ -28,7 +29,7 @@ export class SessionService {
         });
     }
 
-    async findOne(id: number) {
+    async findOne(id: number): Promise<Session> {
         const session = await this.prismaService.session.findUnique({
             where: {
                 id,
@@ -42,7 +43,7 @@ export class SessionService {
         return session;
     }
 
-    async update(id: number, updateSessionDto: UpdateSessionDto) {
+    async update(id: number, updateSessionDto: UpdateSessionDto): Promise<Session> {
         const updatedSession = await this.prismaService.session.update({
             where: {
                 id,
@@ -53,14 +54,12 @@ export class SessionService {
         return updatedSession;
     }
 
-    async remove(id: number) {
-        const deletedSession = await this.prismaService.session.delete({
+    async delete(id: number): Promise<void> {
+        await this.prismaService.session.delete({
             where: {
                 id,
             },
         });
-
-        return `Session with ID ${deletedSession.id} has been deleted.`;
     }
 
     async getResultsForSession(sessionId: number): Promise<Result[]> {

@@ -40,6 +40,6 @@ export class SessionController {
 
     @Delete(':id')
     remove(@Param('id', ParseIntPipe) id: number) {
-        return this.sessionService.remove(id);
+        return this.sessionService.delete(id);
     }
 }

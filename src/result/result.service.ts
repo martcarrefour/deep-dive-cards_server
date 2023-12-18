@@ -54,7 +54,7 @@ export class ResultService {
         return updatedResult;
     }
 
-    async remove(id: number): Promise<void> {
+    async delete(id: number): Promise<void> {
         await this.findOne(id);
 
         await this.prismaService.result.delete({
