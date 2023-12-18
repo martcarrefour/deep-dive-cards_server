@@ -19,7 +19,7 @@ import { Tokens } from './interfaces';
 import { Response, Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { Cookie, Public, UserAgent } from '@common/decorators';
-import { UserResponse } from '@user/responses';
+import { UserResponse } from '@user/dto';
 import { GoogleGuard } from './guards/google.guard';
 import { BASE_URL } from './config';
 import { HttpService } from '@nestjs/axios';

@@ -1,8 +1,7 @@
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { CreateTagDto } from './dto/create-tag.dto';
-import { UpdateTagDto } from './dto/update-tag.dto';
 import { PrismaService } from '@prisma/prisma.service';
 import { Tag } from '@prisma/client';
+import { CreateTagDto, UpdateTagDto } from './dto';
 
 @Injectable()
 export class TagService {

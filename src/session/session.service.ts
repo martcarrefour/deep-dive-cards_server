@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateSessionDto } from './dto/create-session.dto';
-import { UpdateSessionDto } from './dto/update-session.dto';
+
 import { PrismaService } from '@prisma/prisma.service';
 import { JwtPayload } from '@auth/interfaces';
-import { Card, Result, Session, UserAnswer } from '@prisma/client';
+import { Result, Session, UserAnswer } from '@prisma/client';
+import { CreateSessionDto, UpdateSessionDto } from './dto';
 
 @Injectable()
 export class SessionService {

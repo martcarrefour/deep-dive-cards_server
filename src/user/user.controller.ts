@@ -11,7 +11,7 @@ import {
     UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserResponse } from './responses';
+import { UserResponse } from './dto';
 import { JwtPayload } from '@auth/interfaces';
 import { CurrentUser } from '@common/decorators';
 import { User } from '@prisma/client';

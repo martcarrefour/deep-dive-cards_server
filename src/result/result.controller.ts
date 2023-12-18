@@ -11,9 +11,9 @@ import {
     UsePipes,
 } from '@nestjs/common';
 import { ResultService } from './result.service';
-import { CreateResultDto } from './dto/create-result.dto';
-import { UpdateResultDto } from './dto/update-result.dto';
+
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { CreateResultDto, UpdateResultDto } from './dto';
 
 @ApiBearerAuth()
 @ApiTags('result')
