@@ -19,7 +19,7 @@ import { Tokens } from './interfaces';
 import { Response, Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { Cookie, Public, UserAgent } from '@common/decorators';
-import { UserResponse } from '@user/dto';
+
 import { GoogleGuard } from './guards/google.guard';
 import { BASE_URL } from './config';
 import { HttpService } from '@nestjs/axios';
@@ -28,6 +28,7 @@ import { handleTimeoutAndErrors } from '@common/helpers';
 import { YandexGuard } from './guards/yandex.guard';
 import { AuthProvider } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateUserDto } from '@user/dto';
 
 const REFRESH_TOKEN = 'refreshtoken';
 
@@ -51,7 +52,7 @@ export class AuthController {
             );
         }
 
-        return new UserResponse(user);
+        return new CreateUserDto(user);
     }
 
     @Post('login')

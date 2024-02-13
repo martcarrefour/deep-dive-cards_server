@@ -11,7 +11,7 @@ import {
     UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserResponse } from './dto';
+import { CreateUserDto } from './dto';
 import { JwtPayload } from '@auth/interfaces';
 import { CurrentUser } from '@common/decorators';
 import { User } from '@prisma/client';
@@ -27,14 +27,14 @@ export class UserController {
     @Get('me')
     async me(@CurrentUser() user: JwtPayload) {
         const me = await this.userService.findByEmailOrId(user.email);
-        return new UserResponse(me);
+        return new CreateUserDto(me);
     }
 
     @UseInterceptors(ClassSerializerInterceptor)
     @Patch()
     async updateUser(@Body() body: Partial<User>) {
         const user = await this.userService.create(body);
-        return new UserResponse(user);
+        return new CreateUserDto(user);
     }
 
     @UseInterceptors(ClassSerializerInterceptor)
@@ -44,7 +44,7 @@ export class UserController {
         if (!user) {
             throw new NotFoundException();
         }
-        return new UserResponse(user);
+        return new CreateUserDto(user);
     }
 
     @Delete(':id')

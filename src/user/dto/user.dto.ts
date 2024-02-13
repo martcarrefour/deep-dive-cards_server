@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsOptional, IsString, IsEnum } from 'class-validator';
-import { UserRole, AuthProvider } from '@prisma/client';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, IsEnum, IsBoolean, IsDate } from 'class-validator';
+import { UserRole, AuthProvider, User } from '@prisma/client';
+import { Type } from 'class-transformer';
 
-export class CreateUserDto {
+export class CreateUserDto implements User {
     @ApiProperty()
     @IsEmail()
     email: string;
@@ -10,7 +11,7 @@ export class CreateUserDto {
     @ApiProperty({ required: false })
     @IsString()
     @IsOptional()
-    username?: string;
+    username: string;
 
     @ApiProperty()
     @IsString()
@@ -20,10 +21,32 @@ export class CreateUserDto {
     @ApiProperty({ required: false })
     @IsEnum(UserRole, { each: true })
     @IsOptional()
-    roles?: UserRole[];
+    roles: UserRole[];
 
     @ApiProperty({ required: false })
     @IsEnum(AuthProvider)
     @IsOptional()
-    provider?: AuthProvider;
+    provider: AuthProvider;
+
+    constructor(user: User) {
+        Object.assign(this, user);
+    }
+    @ApiProperty()
+    @IsString()
+    @IsNotEmpty()
+    id: string;
+
+    @ApiProperty()
+    @IsDate()
+    @Type(() => Date)
+    createdAt: Date;
+
+    @ApiProperty()
+    @IsDate()
+    @Type(() => Date)
+    updatedAt: Date;
+
+    @ApiProperty()
+    @IsBoolean()
+    isBlocked: boolean;
 }
